@@ -15,3 +15,25 @@ npm install
 
 [Node.js can be installed from here](https://nodejs.org/en/download/)
 
+### Using Git
+
+To add all changed documents to the commit
+```
+git add *
+```
+
+Add a commit
+```
+git commit -m "My commit message"
+```
+
+To check current changes
+```
+git status
+```
+
+Push to the repository
+```
+git push
+```
+
