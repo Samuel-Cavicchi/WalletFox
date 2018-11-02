@@ -1,0 +1,22 @@
+{
+  "name": "walletfox",
+  "version": "1.0.0",
+  "description": "An app for sharing payments between friends and family",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Samuel-Cavicchi/WalletFox.git"
+  },
+  "author": "Samuel Cavicchi, Josef Wakman",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Samuel-Cavicchi/WalletFox/issues"
+  },
+  "homepage": "https://github.com/Samuel-Cavicchi/WalletFox#readme",
+  "dependencies": {
+    "express": "^4.16.4"
+  }
+}
