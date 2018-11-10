@@ -15,6 +15,12 @@ npm install
 
 [Node.js can be installed from here](https://nodejs.org/en/download/)
 
+### Running the App
+
+```
+npm start
+```
+
 ### Using Git
 
 To add all changed documents to the commit
