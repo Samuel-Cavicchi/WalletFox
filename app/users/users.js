@@ -5,7 +5,7 @@ app.get("/users", function (request, response) {
 })
 
 // Requesting a specific wallet ID
-app.get("users:id", function (request, response) {
+app.get("/wallets/:id", function (request, response) {
     const id = request.params.id;
     const wallet = wallets.find(wallet => wallet.id == id);
     if (wallet) { // If wallet != null
