@@ -3,29 +3,15 @@ Routes.js redirects all app routes to the correct route
 */
 
 const routes = require("express").Router();
-const users = require("./users/users.js");
 
 routes.get('/', (req, res) => {
-    res.status(200).json({message: "Connected to WalletFox"})
+    res.status(200).json("Welcome to WalletFox API")
 });
 
-routes.get('/users', users);
+routes.use('/users', require('./users/users.js'))
+routes.use('/wallets', require('./wallets/wallets.js'))
+routes.use('/wallet-debts', require('./wallet-debts/wallet-debts.js'))
+routes.use('/payments', require('./payments/payments.js'))
+routes.use('/payment-debts', require('./payment-debts/payment-debts.js'))
 
-// // Requesting all wallets
-// app.get("/wallets", function (request, response) {
-//     response.status(200).json(wallets); // Return all wallets with 200 OK
-// })
-
-// // Requesting a specific wallet ID
-// app.get("wallets:id", function (request, response) {
-//     const id = request.params.id;
-//     const wallet = wallets.find(wallet => wallet.id == id);
-//     if (wallet) { // If wallet != null
-//         response.status(200).json(wallet); // Return the specific wallet with 200 OK
-//     } else {
-//         response.status(400).end(); // If wallet does not exist, return 400 Bad Request
-//     }
-// })
-
-// Export our express router module with all our custom routes
 module.exports = routes;
