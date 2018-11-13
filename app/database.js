@@ -56,7 +56,7 @@ function getUsers() {
 
 // Get specific user
 function getUser(userId) {
-    return new Promise(resolve, reject => {
+    return new Promise(function(resolve, reject){
         const user = usersTable.find(user => user.id == userId);
         if(user) {
             resolve(user);
@@ -66,4 +66,4 @@ function getUser(userId) {
     });
 }
 
-module.exports = getUser();
+exports.getUser = getUser;
