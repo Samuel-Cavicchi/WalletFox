@@ -9,7 +9,7 @@ routes.get('/', (req, res) => {
     res.status(200).json({message: "Connected to WalletFox"})
 });
 
-routes.get('/users', users);
+//routes.get('/users', users);
 
 // // Requesting all wallets
 // app.get("/wallets", function (request, response) {
