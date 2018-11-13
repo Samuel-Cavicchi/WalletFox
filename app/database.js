@@ -1,5 +1,5 @@
 
-const wallets = [
+const walletsTable = [
     {
         id: 1,
         name: "Sam's Wallet",
@@ -12,7 +12,7 @@ const wallets = [
     }
 ];
 
-const payments = [ // A list of all payments
+const paymentsTable = [ // A list of all payments
     {
         id: 1,
         wallet: 2, // Wallet ID
@@ -22,7 +22,7 @@ const payments = [ // A list of all payments
     }
 ]
 
-const paymentDebt = [
+const paymentDebtsTable = [
     {
         id: 1,
         userOwing: 1333, // The user who must pay money
@@ -30,3 +30,40 @@ const paymentDebt = [
         amount: 60.0
     }
 ]
+
+const usersTable = [
+    {
+        id: 0,
+        name: 'Josef Wakman',
+        password: 'randomhash'
+    },
+    {
+        id: 1,
+        name: 'Samuel Cavicchi',
+        password: 'randomhash'
+    }
+]
+
+function getUsers() {
+    return new Promise(resolve, reject => {
+        if(usersTable != null) {
+            resolve(usersTable);
+        } else {
+            reject(new Error('No User\'s table found'));
+        }
+    }) ;
+}
+
+// Get specific user
+function getUser(userId) {
+    return new Promise(resolve, reject => {
+        const user = usersTable.find(user => user.id == userId);
+        if(user) {
+            resolve(user);
+        } else {
+            reject(new Error('User not found'));
+        }
+    });
+}
+
+module.exports = getUser();
