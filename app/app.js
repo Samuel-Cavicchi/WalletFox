@@ -17,13 +17,9 @@ app.listen(8080, () => {
 // Requesting a specific user ID
 app.get("/users/:id", function (request, response) {
     const id = request.params.id;
-    db.getUser(id).then(function(user) {
-        if (user) { // If wallet != null
-            response.status(200).json(user); // Return the specific wallet with 200 OK
-        } else {
-            response.status(400).end(); // If wallet does not exist, return 400 Bad Request
-        }
-    })
+    db.getUser(id).then(user => {
+        response.status(200).json(user); // Return the specific wallet with 200 OK
+    }).catch(error => response.status(404).json(error.message)) 
 })
 
 // GET specific wallet
