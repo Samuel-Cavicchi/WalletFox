@@ -29,10 +29,7 @@ app.get("/users/:id", function (request, response) {
 // GET specific wallet
 app.get("/wallets/:id", function (request, response) {
     const id = request.params.id;
-    const wallet = wallets.find(wallet => wallet.id == id);
-    if (wallet) { // If wallet != null
+    db.getWallet(id).then(wallet => {
         response.status(200).json(wallet); // Return the specific wallet with 200 OK
-    } else {
-        response.status(400).end(); // If wallet does not exist, return 400 Bad Request
-    }
+    }).catch(error => response.status(404).json(error.message))
 })

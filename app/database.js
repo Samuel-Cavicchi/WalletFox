@@ -10,7 +10,7 @@ const walletsTable = [
         name: "Group House",
         currency: "AUD"
     }
-];
+]
 
 const paymentsTable = [ // A list of all payments
     {
@@ -47,23 +47,35 @@ const usersTable = [
 function getUsers() {
     return new Promise(resolve, reject => {
         if(usersTable != null) {
-            resolve(usersTable);
+            resolve(usersTable)
         } else {
-            reject(new Error('No User\'s table found'));
+            reject(new Error('No User\'s table found'))
         }
-    }) ;
+    }) 
 }
 
 // Get specific user
 function getUser(userId) {
     return new Promise(function(resolve, reject) {
-        const user = usersTable.find(user => user.id == userId);
+        const user = usersTable.find(user => user.id == userId)
         if(user) {
-            resolve(user);
+            resolve(user)
         } else {
-            reject(new Error('User not found'));
+            reject(new Error('Error: User not found'))
         }
-    });
+    })
 }
 
-exports.getUser = getUser;
+function getWallet(walletId) {
+    return new Promise(function(resolve, reject) {
+        const wallet = walletsTable.find(wallet => wallet.id == walletId)
+        if (wallet) {
+            resolve(wallet)
+        } else {
+            reject(new Error('Error: Wallet not found'))
+        }
+    })
+}
+
+exports.getUser = getUser
+exports.getWallet = getWallet
