@@ -12,7 +12,11 @@ app.listen(8080, () => {
     console.log('Wallet Fox listening on port 8080'); // DELETE ON SUBMISSION
 });
 
-//test comment
+/*
+----------------------------
+GET requests
+------------------------------
+*/
 
 // Requesting a specific user ID
 app.get("/users/:id", function (request, response) {
@@ -30,6 +34,7 @@ app.get("/wallets/:id", function (request, response) {
     ).catch(error => response.status(404).json(error.message))
 })
 
+// GET specific payment
 app.get("/payments/:id", function(request, response) {
     const id = request.params.id
     db.getPayment(id).then(payment => 
@@ -37,9 +42,40 @@ app.get("/payments/:id", function(request, response) {
     ).catch(error => response.status(404).json(error.message))
 })
 
+// GET specific payment debt
 app.get("/paymentdebts/:id", function(request, response) {
     const id = request.params.id
     db.getPaymentDebt(id).then(debt => 
         response.status(200).json(debt)
     ).catch(error => response.status(404).json(error.message))
 })
+
+/*
+-------------------------------
+POST requests
+--------------------------------
+*/
+
+const bodyParser = require('body-parser') // TODO: Move this to a more fitting place
+app.use(bodyParser.json()) // Set bodyparser to JSON? Need to look this up
+
+app.post("/users", function(request, response) {
+    const userToAdd = request.body
+
+    const users = db.getUsers().then(users => {
+        userToAdd.id = users[users.length-1].id + 1
+    }).catch(error => {
+        console.log("Error with POST /users")
+    })
+
+    db.addUser(userToAdd)
+    response.status(201).json("Location: users/" + userToAdd.id)
+})
+
+
+
+/* 
+---------------------------------
+PUT requests
+--------------------------------
+*/

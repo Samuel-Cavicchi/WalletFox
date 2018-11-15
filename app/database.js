@@ -54,6 +54,11 @@ function getUsers() {
     }) 
 }
 
+function addUser(user) {
+    usersTable.push(user)
+}
+
+
 // Get specific user
 function getUser(userId) {
     return new Promise(function(resolve, reject) {
@@ -99,6 +104,8 @@ function getPaymentDebt(paymentDebtId) {
     })
 }
 
+exports.getUsers = getUsers
+exports.addUser = addUser
 exports.getUser = getUser
 exports.getWallet = getWallet
 exports.getPayment = getPayment
