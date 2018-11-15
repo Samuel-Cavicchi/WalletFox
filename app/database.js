@@ -88,6 +88,18 @@ function getPayment(paymentId) {
     })
 }
 
+function getPaymentDebt(paymentDebtId) {
+    return new Promise(function(resolve, reject) {
+        const debt = paymentDebtsTable.find(debt => debt.id == paymentDebtId)
+        if (debt) {
+            resolve(debt)
+        } else {
+            reject(new Error('Error: PaymentDebt with this ID not found'))
+        }
+    })
+}
+
 exports.getUser = getUser
 exports.getWallet = getWallet
 exports.getPayment = getPayment
+exports.getPaymentDebt = getPaymentDebt

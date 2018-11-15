@@ -36,3 +36,10 @@ app.get("/payments/:id", function(request, response) {
         response.status(200).json(payment)
     ).catch(error => response.status(404).json(error.message))
 })
+
+app.get("/paymentdebts/:id", function(request, response) {
+    const id = request.params.id
+    db.getPaymentDebt(id).then(debt => 
+        response.status(200).json(debt)
+    ).catch(error => response.status(404).json(error.message))
+})
