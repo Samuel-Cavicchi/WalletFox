@@ -45,13 +45,13 @@ const usersTable = [
 ]
 
 function getUsers() {
-    return new Promise(resolve, reject => {
+    return new Promise(function(resolve, reject) {
         if(usersTable != null) {
             resolve(usersTable)
         } else {
             reject(new Error('No User\'s table found'))
         }
-    }) 
+    })
 }
 
 function addUser(user) {

@@ -18,6 +18,18 @@ GET requests
 ------------------------------
 */
 
+/*
+    !!! This request is for troubleshooting, and is to be removed before submitting the code !!!
+    TODO: remove this
+*/
+app.get("/users", function (request, response) {
+    db.getUsers().then(users => 
+        response.status(200).json(users) // Return all users
+    ).catch(error => response.status(404).json(error.message)) 
+})
+
+
+
 // Requesting a specific user ID
 app.get("/users/:id", function (request, response) {
     const id = request.params.id
@@ -64,12 +76,12 @@ app.post("/users", function(request, response) {
 
     const users = db.getUsers().then(users => {
         userToAdd.id = users[users.length-1].id + 1
+        db.addUser(userToAdd)
+        response.status(201).json("Location: users/" + userToAdd.id)
     }).catch(error => {
         console.log("Error with POST /users")
+        response.status(500).end("There was an error with post/users :(")
     })
-
-    db.addUser(userToAdd)
-    response.status(201).json("Location: users/" + userToAdd.id)
 })
 
 
