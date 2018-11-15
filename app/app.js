@@ -16,16 +16,23 @@ app.listen(8080, () => {
 
 // Requesting a specific user ID
 app.get("/users/:id", function (request, response) {
-    const id = request.params.id;
-    db.getUser(id).then(user => {
-        response.status(200).json(user); // Return the specific wallet with 200 OK
-    }).catch(error => response.status(404).json(error.message)) 
+    const id = request.params.id
+    db.getUser(id).then(user => 
+        response.status(200).json(user) // Return the specific wallet with 200 OK
+    ).catch(error => response.status(404).json(error.message)) 
 })
 
 // GET specific wallet
 app.get("/wallets/:id", function (request, response) {
-    const id = request.params.id;
-    db.getWallet(id).then(wallet => {
-        response.status(200).json(wallet); // Return the specific wallet with 200 OK
-    }).catch(error => response.status(404).json(error.message))
+    const id = request.params.id
+    db.getWallet(id).then(wallet => 
+        response.status(200).json(wallet) // Return the specific wallet with 200 OK
+    ).catch(error => response.status(404).json(error.message))
+})
+
+app.get("/payments/:id", function(request, response) {
+    const id = request.params.id
+    db.getPayment(id).then(payment => 
+        response.status(200).json(payment)
+    ).catch(error => response.status(404).json(error.message))
 })

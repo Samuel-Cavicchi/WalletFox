@@ -61,7 +61,7 @@ function getUser(userId) {
         if(user) {
             resolve(user)
         } else {
-            reject(new Error('Error: User not found'))
+            reject(new Error('Error: User with this ID not found'))
         }
     })
 }
@@ -72,10 +72,22 @@ function getWallet(walletId) {
         if (wallet) {
             resolve(wallet)
         } else {
-            reject(new Error('Error: Wallet not found'))
+            reject(new Error('Error: Wallet with this ID not found'))
+        }
+    })
+}
+
+function getPayment(paymentId) {
+    return new Promise(function(resolve, reject) { 
+        const payment = paymentsTable.find(payment => payment.id == paymentId)
+        if (payment) {
+            resolve(payment)
+        } else {
+            reject(new Error('Error: Payment with this ID not found'))
         }
     })
 }
 
 exports.getUser = getUser
 exports.getWallet = getWallet
+exports.getPayment = getPayment
