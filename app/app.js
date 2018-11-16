@@ -69,7 +69,7 @@ POST requests
 */
 
 const bodyParser = require('body-parser') // TODO: Move this to a more fitting place
-app.use(bodyParser.json()) // Set bodyparser to JSON? Need to look this up
+app.use(bodyParser.urlencoded({extended: false})) // Set bodyparser to JSON? Need to look this up
 
 app.post("/users", function(request, response) {
     const userToAdd = request.body
