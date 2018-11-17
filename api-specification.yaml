@@ -12,9 +12,21 @@ info:
   license:
     name: Apache 2.0
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+tags:
+  - name: Wallet 
+    description: Wallet related methods
+  - name: Payment 
+    description: Payment related methods
+  - name: User 
+    description: User related methods
+  - name: All 
+    description: All API methods
 paths:
-  /users{userId}:
+  /users/{userId}:
     get:
+      tags:
+        - User 
+        - All 
       summary: Get a user by ID
       operationId: getUser
       description: Get a specific user from the API by specifying the user's ID
@@ -22,27 +34,80 @@ paths:
         - in: path
           name: userId
           description: The user's unique ID
-          required: True
+          required: true
           schema:
             type: integer
+      responses:
+        '200':
+          description: OK
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: 'User not found'
+        '400':
+          description: 'Bad request parameters'
+        '500':
+          description: 'Server error, could not connect to database'
     patch:
+      tags:
+      - User 
+      - All 
       summary: Update a user's information
       requestBody:
         description: The user's information
-        required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/User'
+      parameters: 
+        - in: path
+          required: true
+          name: userId
+          description: The user's unique ID
+          schema: 
+            type: integer
       responses: 
         '204':
-          description: Updated, no content
+          description: 'Updated, no content'
         '400':
-          description: Bad Request
+          description: 'Bad Request'
+        '401':
+          description: 'Insufficient permissions to update this user'
         '404':
-          description: User not found
+          description: 'User not found'
+        '500':
+          description: 'Server error, could not connect to database'
+    delete:
+      tags:
+      - User 
+      - All 
+      summary: Delete a user
+      description: Delete a user from the database
+      parameters: 
+        - in: path
+          required: true
+          name: userId
+          description: The user's unique id
+          schema: 
+            type: integer
+      responses: 
+        '204':
+          description: 'Deleted, no content'
+        '401':
+          description: 'Insufficient permissions to delete this user'
+        '400':
+          description: 'Bad Request'
+        '404':
+          description: 'User not found'
+        '500':
+          description: 'Server error, could not connect to database'
   /users:
     get:
+      tags:
+      - User 
+      - All 
       summary: Search through users resource
       operationId: searchUsers
       description: |
@@ -50,13 +115,19 @@ paths:
       parameters:
         - in: query
           name: userName
-          description: The user's name
+          description: Search by the user's name
           required: false
           schema:
             type: string
         - in: query
           name: userEmail
-          description: The user's email
+          description: Search by the user's email
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: walletId
+          description: Search by the wallet the user is a member of
           required: false
           schema:
             type: string
@@ -85,18 +156,29 @@ paths:
                 items:
                   $ref: '#/components/schemas/User'
         '400':
-          description: bad input parameter
+          description: 'Bad input parameters'
+        '500':
+          description: 'Server error, could not connect to database'
     post:
-      summary: adds a user
+      tags:
+        - User 
+        - All 
+      summary: Create a user
       operationId: addUser
-      description: Adds an user to the database
+      description: Creates a new user on the database
       responses:
         '201':
           description: user created
+          headers: 
+            Location:
+              schema:
+                type: string
+              description: 'The URI location of the created user'
+            
         '400':
           description: 'invalid input, object invalid'
-        '409':
-          description: an existing item already exists
+        '500':
+          description: 'Server error, could not connect to database'
       requestBody:
         content:
           application/json:
@@ -105,10 +187,19 @@ paths:
         description: User to add
   /wallets:
     get:
+      tags:
+      - Wallet 
+      - All 
       summary: Search through a user's wallets
       operationId: searchWallets
       description: Search for a specific wallet
       parameters: 
+        - in: query
+          name: userId
+          description: The id of the user who is a member of the wallets
+          required: false
+          schema:
+            type: string
         - in: query
           name: walletName
           description: The name of the wallet
@@ -120,7 +211,7 @@ paths:
           description: The currency of the wallet
           required: false
           schema:
-            type: currency
+            type: string
         - in: query
           name: skip
           description: number of records to skip for pagination
@@ -138,16 +229,580 @@ paths:
             maximum: 50
       responses: 
         '200':
-        description: Array of wallets matching criteria, returns empty if none found
+          description: Array of wallets matching criteria, returns empty if none found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Wallet'
+        '400':
+          description: 'Bad input parameters'
+        '500':
+          description: 'Server error, could not connect to database'
+  /wallets/{userId}:  
+    post:
+      tags:
+      - All 
+      - Wallet 
+      summary: Create a new wallet
+      operationId: addWallet
+      description: Adds a new wallet to the database and automatically creates the wallet member relation for the user
+      parameters:
+        - in: path
+          required: true
+          name: userId
+          description: The ID of the User who created this wallet
+          schema:
+            type: integer
+      requestBody:
         content:
           application/json:
             schema:
-              type: array
-              items:
+              $ref: '#/components/schemas/Wallet'
+        description: Wallet to create
+      responses:
+        '201':
+          description: 'wallet created'
+          headers: 
+            Location:
+              schema:
+                type: string
+              description: 'The URI location of the created wallet'
+        '400':
+          description: 'invalid input, object invalid'
+        '500':
+          description: 'Server error, could not connect to database'
+      
+  /wallets/{walletId}:
+    get:
+      tags:
+      - Wallet 
+      - All 
+      summary: Get a wallet by ID
+      operationId: getUser
+      description: Get a specific wallet from the database by specifying the wallet's ID
+      parameters:
+        - in: path
+          name: walletId
+          description: The wallet's unique ID
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content: 
+            application/json:
+              schema:
                 $ref: '#/components/schemas/Wallet'
+        '404':
+          description: 'Wallet does not exist'
+        '500':
+          description: 'Server error, could not connect to database'
+    patch:
+      tags:
+      - Wallet 
+      - All 
+      summary: Update a wallet's information
+      requestBody:
+        description: The wallet's information
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Wallet'
+      parameters: 
+        - in: path
+          required: true
+          name: walletId
+          description: The wallet's unique ID
+          schema: 
+            type: integer
+      responses: 
+        '204':
+          description: 'Updated, no content'
+        '400':
+          description: 'Bad Request'
+        '404':
+          description: 'Wallet not found'
+        '500':
+          description: 'Server error, could not connect to database'
+    delete:
+      tags:
+      - Wallet 
+      - All 
+      summary: Delete a wallet
+      operationId: deletePayment
+      description: Delete the specified wallet including all associated wallet members, payments, payment debts and wallet debts
+      parameters:
+        - in: path
+          required: true
+          name: walletId
+          description: The ID of the wallet to be deleted
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: 'Wallet deleted, no content'
+        '400':
+          description: 'invalid input, object invalid'
+        '401':
+          description: 'Insufficient permissions to delete this wallet'
+        '404':
+          description: 'Wallet not found'
+        '500':
+          description: 'Server error, could not connect to database'
+  /payment-debts:
+    get:
+      tags:
+      - Payment 
+      - All 
+      summary: Search through payment debts
+      operationId: searchPaymentDebts
+      description: Search for payment debts by passing through the correct search parameters
+      parameters: 
+        - in: query
+          name: walletId
+          description: The id of the wallet in which the payment was made
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: userOwing
+          description: The user id who owes in the payment debts
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: payee
+          description: The user id of the user who will be paid by the payment debts
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: skip
+          description: number of records to skip for pagination
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+        - in: query
+          name: limit
+          description: maximum number of records to return
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+            maximum: 50
+      responses: 
+        '200':
+          description: 'Array of all payment debts matching criteria, returns empty if none found'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PaymentDebt'
+        '400':
+          description: 'Bad input parameters'
+        '500':
+          description: 'Server error, could not connect to database'
+    post:
+      tags:
+      - Payment 
+      - All 
+      summary: Create a new payment debt
+      operationId: addPaymentDebt
+      description: Adds a new payment debt to an existing payment
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentDebt'
+        description: Payment Debt to add
+      responses:
+        '201':
+          description: 'Payment created'
+          headers: 
+            Location:
+              schema:
+                type: string
+              description: 'The URI location of the created payment debt'
+        '400':
+          description: 'Bad request'
+        '500':
+          description: 'Server error, could not connect to database'
+  /payment-debts/{paymentDebtId}:
+    delete:
+      tags:
+      - Payment 
+      - All 
+      summary: Delete a payment debt
+      operationId: deletePaymentDebt
+      description: Deletes a specific payment debt from a payment
+      parameters:
+        - in: path
+          required: true
+          name: paymentDebtId
+          description: The payment debt id of the debt to be deleted
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Payment debt deleted, no content
+        '400':
+          description: 'Bad request parameters'
+        '404':
+          description: 'Payment debt not found'
+        '500':
+          description: 'Server error, could not connect to database'
+    patch:
+      tags:
+      - Payment 
+      - All 
+      summary: Update a payment debt
+      operationId: updatePaymentDebt
+      description: Updates a specific payment debt on a payment
+      parameters:
+        - in: path
+          required: true
+          name: paymentDebtId
+          description: The payment id of the payment to be deleted
+          schema:
+            type: integer
+      requestBody:
+        description: The new payment debt information to be updated
+        content: 
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentDebt'
+      responses:
+        '204':
+          description: 'Payment updated, no content'
+        '400':
+          description: 'Bad request parameters'
+        '404':
+          description: 'Payment not found'
+        '500':
+          description: 'Server error, could not connect to database'
+  /payments:
+    get:
+      tags:
+        - Payment 
+        - Wallet 
+        - All 
+      summary: Search through payments
+      operationId: searchPayments
+      description: Search for payments by passing through the correct search parameters
+      parameters: 
+        - in: query
+          name: walletId
+          description: The id of the wallet in which the payment was made
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: payee
+          description: The user id of the user who made the payment
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: skip
+          description: number of records to skip for pagination
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+        - in: query
+          name: limit
+          description: maximum number of records to return
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+            maximum: 50
+      responses: 
+        '200':
+          description: Array of all payments matching criteria, returns empty if none found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Payment'
         '400':
           description: Bad input parameters
-  
+        '500':
+          description: 'Server error, could not connect to database'
+    post:
+      tags:
+      - Payment 
+      - Wallet 
+      - All 
+      summary: Create a new payment
+      operationId: addPayment
+      description: Adds a new payment to a specified wallet
+      responses:
+        '201':
+          description: 'Payment created'
+          headers: 
+            Location:
+              schema:
+                type: string
+              description: 'The URI location of the created payment'
+        '400':
+          description: 'invalid input, object invalid'
+        '404':
+          description: 'Wallet / Payee not found'
+        '500':
+          description: 'Server error, could not connect to database'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Payment'
+        description: Payment to add
+  /payments/{paymentId}:
+    delete:
+      tags:
+      - Payment 
+      - Wallet 
+      - All 
+      summary: Delete a payment
+      operationId: deletePayment
+      description: Deletes a specific payment from a wallet
+      parameters:
+        - in: path
+          required: true
+          name: paymentId
+          description: The payment id of the payment to be deleted
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Payment deleted, no content
+        '400':
+          description: 'invalid input, object invalid'
+        '404':
+          description: 'Payment not found'
+        '500':
+          description: 'Server error, could not connect to database'
+    patch:
+      tags:
+      - Payment 
+      - Wallet 
+      - All 
+      summary: Update a payment
+      operationId: updatePayment
+      description: Updates a specific payment from a wallet
+      parameters:
+        - in: path
+          required: true
+          name: paymentId
+          description: The payment id of the payment to be updated
+          schema:
+            type: integer
+      requestBody:
+        description: The new payment information to be updated
+        content: 
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Payment'
+      responses:
+        '204':
+          description: Payment updated, no content
+        '400':
+          description: 'Bad request parameters'
+        '404':
+          description: 'Payment not found'
+        '500':
+          description: 'Server error, could not connect to database'
+  /wallet-debts:
+    get:
+      tags:
+      - All 
+      - Wallet 
+      - Payment 
+      summary: Search through wallet debts
+      operationId: searchWalletDebts
+      description: Search through all wallet debts given the correct search parameters
+      parameters:
+        - in: query
+          name: walletId
+          description: |
+            Find the wallet-debts for the specified wallet id
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Returns an array of all wallet-debts matching the criteria supplied, returns empty if none found
+          content: 
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WalletDebt'
+        '400':
+          description: Bad request
+        '500':
+          description: 'Server error, could not connect to database'
+  /wallet-debts/{walletId}:
+    post:
+      tags:
+      - Payment 
+      - Wallet 
+      - All 
+      summary: Generate wallet debts
+      operationId: generateWalletDebts
+      description: Tells the back end api to generate all wallet debts for all outstanding payments and payment debts for this wallet, returns a JSON array of the generated result
+      parameters:
+        - in: path
+          required: true
+          name: walletId
+          description: The wallet id that we want to generate wallet debts for
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: 'Valid request but no wallet debts were created because no payments could be found'
+        '201':
+          description: 'Debts created'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WalletDebt'
+        '400':
+          description: 'invalid input, object invalid'
+        '404':
+          description: 'Wallet not found'
+        '500':
+          description: 'Server error, could not connect to database'
+  /wallet-debts/{walletDebtId}:
+    patch:
+      tags:
+      - All 
+      - Wallet 
+      - Payment 
+      summary: Update a wallet debt
+      operationId: updateWalletDebt
+      description: Updates a specific wallet debt from a wallet
+      parameters:
+        - in: path
+          required: true
+          name: walletDebtId
+          description: The wallet debt id of the payment to be updated
+          schema:
+            type: integer
+      requestBody:
+        description: The new wallet debt information to be updated
+        content: 
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WalletDebt'
+      responses:
+        '204':
+          description: 'Debt updated updated, no content'
+        '400':
+          description: 'Bad request parameters'
+        '404':
+          description: 'Wallet Debt not found'
+        '500':
+          description: 'Server error, could not connect to database'
+  /wallet-members:
+    get:
+      tags:
+      - Wallet 
+      - User 
+      - All 
+      summary: Search through wallet members
+      operationId: searchWalletDebts
+      description: Search through all wallet members given the correct search parameters, and return a select few results
+      parameters:
+        - in: query
+          name: walletId
+          description: |
+            Find the wallet members for the specified wallet id
+          required: false
+          schema:
+            type: integer
+        - in: query
+          name: userId
+          description: |
+            Find the wallet members for the specified user id
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Returns an array of all wallet members matching the criteria supplied, returns empty if none found
+          content: 
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WalletMember'
+        '400':
+          description: Bad request
+        '500':
+          description: 'Server error, could not connect to database'
+  /wallet-members/{userId}:  
+    post:
+      tags:
+        - User 
+        - Wallet 
+        - All 
+      summary: Adds a wallet member
+      operationId: addUser
+      description: Adds an existing user to a specific wallet
+      parameters:
+        - in: path
+          required: true
+          name: userId
+          description: The user id to be added as a wallet member
+          schema: 
+            type: integer
+      responses:
+        '201':
+          description: Wallet member created
+          headers: 
+            Location:
+              schema:
+                type: string
+              description: 'The URI location of the created wallet member'
+        '400':
+          description: 'invalid input, object invalid'
+        '409':
+          description: This user is already a member of this wallet
+        '500':
+          description: 'Server error, could not connect to database'
+  /wallet-members/{walletMemberId}:
+    delete:
+      tags:
+      - User 
+      - Wallet 
+      - All 
+      summary: Remove a user from a wallet
+      parameters: 
+        - in: path
+          required: true
+          name: walletMemberId
+          description: The wallet member's unique ID
+          schema: 
+            type: integer
+      responses: 
+        '204':
+          description: 'Deleted, no content'
+        '400':
+          description: 'Bad Request'
+        '404':
+          description: 'Wallet member not found'
+        '500':
+          description: 'Server error, could not connect to database'
+      
 components:
   schemas:
     User:
@@ -171,6 +826,10 @@ components:
           description: The user's email
           type: string
           example: "John@example.com"
+        password:
+          description: The user's password
+          type: string
+          example: "mypassword1"
     Wallet:
       description: The resource that acts as a shared wallet between wallet members. Contains payments, payment debts, wallet debts and wallet members
       type: object
@@ -267,10 +926,11 @@ components:
           example: 1234 
           description: The ID of the user who owe's this amount to the original Payment
         amount:
-          type: float
+          type: number
           example: 22.50
           description: The amount of money owed in this debt
     WalletDebt:
+      description: A debt created by the backend appliction. These debts are required to be paid to settle all wallet member's debts and owings.
       type: object
       required: 
         - id
