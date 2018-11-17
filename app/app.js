@@ -19,6 +19,7 @@ GET requests
 */
 
 /*
+    --------------------------------------------
     !!! This request is for troubleshooting, and is to be removed before submitting the code !!!
     TODO: remove this
 */
@@ -27,6 +28,16 @@ app.get("/users", function (request, response) {
         response.status(200).json(users) // Return all users
     ).catch(error => response.status(404).json(error.message)) 
 })
+
+app.get("/wallets", function(request, response) {
+    db.getWallets().then(wallets => {
+        response.status(200).json(wallets)
+    }).catch(error => response.status(500).json(error.message))
+})
+/*
+    End of functions to be removed
+    -------------------------------------------
+*/
 
 
 
@@ -68,7 +79,7 @@ POST requests
 --------------------------------
 */
 
-const bodyParser = require('body-parser') // TODO: Move this to a more fitting place
+const bodyParser = require('body-parser') // TODO: Move this to a more fitting place after discussion
 app.use(bodyParser.urlencoded({extended: false})) // Set bodyparser to JSON? Need to look this up
 
 app.post("/users", function(request, response) {
@@ -79,11 +90,21 @@ app.post("/users", function(request, response) {
         db.addUser(userToAdd)
         response.status(201).json("Location: users/" + userToAdd.id)
     }).catch(error => {
-        console.log("Error with POST /users")
         response.status(500).end("There was an error with post/users :(")
     })
 })
 
+app.post("/wallets", function(request, response) {
+    const walletToAdd = request.body
+
+    const wallets = db.getWallets().then(wallets => {
+        walletToAdd.id = wallets[wallets.length-1].id + 1
+        db.addWallet(walletToAdd)
+        response.status(201).json("Location: wallets/" + walletToAdd.id)
+    }).catch(error => {
+        response.status(500).end("There was an error with post/wallets :(")
+    })
+})
 
 
 /* 

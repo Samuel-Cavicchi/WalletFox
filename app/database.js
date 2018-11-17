@@ -71,6 +71,20 @@ function getUser(userId) {
     })
 }
 
+function getWallets() {
+    return new Promise(function(resolve, reject) {
+        if (walletsTable != null) {
+            resolve(walletsTable)
+        } else {
+            reject(new Error("No wallets table found!"))
+        }
+    })
+}
+
+function addWallet(wallet) {
+    walletsTable.push(wallet)
+}
+
 function getWallet(walletId) {
     return new Promise(function(resolve, reject) {
         const wallet = walletsTable.find(wallet => wallet.id == walletId)
@@ -107,6 +121,8 @@ function getPaymentDebt(paymentDebtId) {
 exports.getUsers = getUsers
 exports.addUser = addUser
 exports.getUser = getUser
+exports.getWallets = getWallets
+exports.addWallet = addWallet
 exports.getWallet = getWallet
 exports.getPayment = getPayment
 exports.getPaymentDebt = getPaymentDebt
