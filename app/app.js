@@ -19,9 +19,9 @@ GET requests
 */
 
 /*
-    --------------------------------------------
-    !!! This request is for troubleshooting, and is to be removed before submitting the code !!!
-    TODO: remove this
+    ------------------------------------------------------ !!!!
+    !!! These requests are for troubleshooting, and are to be removed before submitting the code !!!
+    TODO: remove this unless we can find a good reason to keep them. If not it's a security risk
 */
 app.get("/users", function (request, response) {
     db.getUsers().then(users => 
@@ -29,14 +29,16 @@ app.get("/users", function (request, response) {
     ).catch(error => response.status(404).json(error.message)) 
 })
 
+
 app.get("/wallets", function(request, response) {
     db.getWallets().then(wallets => {
         response.status(200).json(wallets)
     }).catch(error => response.status(500).json(error.message))
 })
+
 /*
     End of functions to be removed
-    -------------------------------------------
+    -------------------------------------------------------------- !!!!
 */
 
 
@@ -112,3 +114,27 @@ app.post("/wallets", function(request, response) {
 PUT requests
 --------------------------------
 */
+
+
+
+/*
+------------------------------
+PATCH requests 
+------------------------------
+*/
+
+app.patch("/users:id", function(request, response) {
+    const userChange = request.body
+    console.log(request.body)
+    console.log(request.params.id)
+
+    db.getUser(userChange.params.id).then(user => {
+        for (key in user) { // Loop through all properties of the user object
+            if (userChange.key != null) { // If the request object has the property, give the user that property
+                console.log(userChange.key)
+
+            } 
+
+        }
+    }).catch(error => response.status(500).json("There was an error with PATCH users/" + request.params.id))
+})
