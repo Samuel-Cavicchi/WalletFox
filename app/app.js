@@ -125,24 +125,17 @@ PATCH requests
 
 
 
+// TODO: Perhaps return error if trying to patch id?
 app.patch("/users/:id", function (request, response) {
-    const userChange = request.body
-    console.log(userChange)
-    console.log(userChange.name)
-    console.log(request.params.id)
+    const body = request.body
 
     db.getUser(request.params.id).then(user => {
-        console.log("User: ", user)
-        for (key in user) { // Loop through all properties of the user object
-            console.log("Key: ", key)
-            console.log("string(key): ", user[key])
-            console.log("userchange[key]", userChange[key])
-            if (userChange[key] != undefined) { // If the request object has the property, give the user that property
-                console.log("UserChange.key:", key )
-                user[key] = userChange[key]
+        for (key in user) { 
+            if (body[key] != undefined) { // In the user object all values that matches a key of the body are replaced
+                user[key] = body[key]
             }
         }
-        console.log("Updated user: ", user)
+        
         response.status(201).json("User updated")
     }).catch(error => response.status(500).json("There was an error with PATCH users/" + request.params.id))
 })
