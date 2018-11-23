@@ -71,6 +71,17 @@ function getUser(userId) {
     })
 }
 
+function deleteUser(userId) {
+    var userToRemove = getUser(userId)
+    usersTable.splice(userToRemove, 1)
+
+    return new Promise(function(resolve, reject) {
+        getUser(userId).then(
+            reject(new Error("Error: The user with ID", userId, "is still in the database"))
+        ).catch(resolve)
+    })
+}
+
 function getWallets() {
     return new Promise(function(resolve, reject) {
         if (walletsTable != null) {
@@ -121,6 +132,7 @@ function getPaymentDebt(paymentDebtId) {
 exports.getUsers = getUsers
 exports.addUser = addUser
 exports.getUser = getUser
+exports.deleteUser = deleteUser
 exports.getWallets = getWallets
 exports.addWallet = addWallet
 exports.getWallet = getWallet

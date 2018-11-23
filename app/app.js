@@ -1,8 +1,10 @@
 const express = require("express");
 const routes = require("./routes.js");
 const db = require("./database.js");
+const bodyParser = require('body-parser') // TODO: Move this to a more fitting place after discussion
 
 const app = express();
+app.use(bodyParser.urlencoded({ extended: false })) // Set bodyparser to JSON? Need to look this up
 
 // Re-route all paths to our routing file
 // app.use("/", routes);
@@ -41,7 +43,17 @@ app.get("/wallets", function (request, response) {
     -------------------------------------------------------------- !!!!
 */
 
+app.get("/searchUsers/", function(request, response) {
+    const body = request.body
+    let foundUsers = []
 
+    db.getUsers().then(users => {
+        for (key in body) {
+            foundUsers.push(users.filter(u => u[key] == body[key]))
+        }
+        console.log(foundUsers)
+    })
+})
 
 // Requesting a specific user ID
 app.get("/users/:id", function (request, response) {
@@ -80,9 +92,6 @@ app.get("/paymentdebts/:id", function (request, response) {
 POST requests
 --------------------------------
 */
-
-const bodyParser = require('body-parser') // TODO: Move this to a more fitting place after discussion
-app.use(bodyParser.urlencoded({ extended: false })) // Set bodyparser to JSON? Need to look this up
 
 app.post("/users", function (request, response) {
     const userToAdd = request.body
@@ -135,7 +144,23 @@ app.patch("/users/:id", function (request, response) {
                 user[key] = body[key]
             }
         }
-        
+
         response.status(201).json("User updated")
     }).catch(error => response.status(500).json("There was an error with PATCH users/" + request.params.id))
+})
+
+
+
+/*
+-----------------------------------------
+DELETE requests
+------------------------------------------
+*/
+
+app.delete("/users/:id", function(request, response) {
+    // TODO: Verify that correct permissions are provided in the request
+
+    db.deleteUser(request.params.id).then(() =>
+        response.status(204).json("User with ID " + request.params.id + " was deleted")
+    ).catch(error => response.status(500).json("There was an error with DELETE users/" + request.params.id))
 })
