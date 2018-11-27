@@ -8,6 +8,8 @@ routes.get('/', (req, res) => {
     res.status(200).json("Welcome to WalletFox API")
 });
 
+//routes.get('/users', users);
+=======
 routes.use('/users', require('./users/users.js'))
 routes.use('/wallets', require('./wallets/wallets.js'))
 routes.use('/wallet-debts', require('./wallet-debts/wallet-debts.js'))

@@ -10,7 +10,7 @@ const walletsTable = [
         name: "Group House",
         currency: "AUD"
     }
-];
+]
 
 const paymentsTable = [ // A list of all payments
     {
@@ -45,25 +45,96 @@ const usersTable = [
 ]
 
 function getUsers() {
-    return new Promise(resolve, reject => {
+    return new Promise(function(resolve, reject) {
         if(usersTable != null) {
-            resolve(usersTable);
+            resolve(usersTable)
         } else {
-            reject(new Error('No User\'s table found'));
+            reject(new Error('No User\'s table found'))
         }
-    }) ;
+    })
 }
+
+function addUser(user) {
+    usersTable.push(user)
+}
+
 
 // Get specific user
 function getUser(userId) {
     return new Promise(function(resolve, reject) {
-        const user = usersTable.find(user => user.id == userId);
+        const user = usersTable.find(user => user.id == userId)
         if(user) {
-            resolve(user);
+            resolve(user)
         } else {
-            reject(new Error('User not found'));
+            reject(new Error('Error: User with this ID not found'))
         }
-    });
+    })
 }
 
-exports.getUser = getUser;
+function deleteUser(userId) {
+    var userToRemove = getUser(userId)
+    usersTable.splice(userToRemove, 1)
+
+    return new Promise(function(resolve, reject) {
+        getUser(userId).then(
+            reject(new Error("Error: The user with ID", userId, "is still in the database"))
+        ).catch(resolve)
+    })
+}
+
+function getWallets() {
+    return new Promise(function(resolve, reject) {
+        if (walletsTable != null) {
+            resolve(walletsTable)
+        } else {
+            reject(new Error("No wallets table found!"))
+        }
+    })
+}
+
+function addWallet(wallet) {
+    walletsTable.push(wallet)
+}
+
+function getWallet(walletId) {
+    return new Promise(function(resolve, reject) {
+        const wallet = walletsTable.find(wallet => wallet.id == walletId)
+        if (wallet) {
+            resolve(wallet)
+        } else {
+            reject(new Error('Error: Wallet with this ID not found'))
+        }
+    })
+}
+
+function getPayment(paymentId) {
+    return new Promise(function(resolve, reject) { 
+        const payment = paymentsTable.find(payment => payment.id == paymentId)
+        if (payment) {
+            resolve(payment)
+        } else {
+            reject(new Error('Error: Payment with this ID not found'))
+        }
+    })
+}
+
+function getPaymentDebt(paymentDebtId) {
+    return new Promise(function(resolve, reject) {
+        const debt = paymentDebtsTable.find(debt => debt.id == paymentDebtId)
+        if (debt) {
+            resolve(debt)
+        } else {
+            reject(new Error('Error: PaymentDebt with this ID not found'))
+        }
+    })
+}
+
+exports.getUsers = getUsers
+exports.addUser = addUser
+exports.getUser = getUser
+exports.deleteUser = deleteUser
+exports.getWallets = getWallets
+exports.addWallet = addWallet
+exports.getWallet = getWallet
+exports.getPayment = getPayment
+exports.getPaymentDebt = getPaymentDebt
