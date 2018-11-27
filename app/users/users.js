@@ -33,11 +33,7 @@ routes.get("/:id", function (request, response) {
 })
 
 
-/*
-    ------------------------------------------------------ !!!!
-    !!! These requests are for troubleshooting, and are to be removed before submitting the code !!!
-    TODO: remove this unless we can find a good reason to keep them. If not it's a security risk
-*/
+
 routes.get("", function (request, response) {
 
     db.getUsers().then(users => 

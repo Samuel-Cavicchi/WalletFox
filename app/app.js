@@ -21,7 +21,11 @@ GET requests
 */
 
 
-
+/*
+    ------------------------------------------------------ !!!!
+    !!! These requests are for troubleshooting, and are to be removed before submitting the code !!!
+    TODO: remove this unless we can find a good reason to keep them. If not it's a security risk
+*/
 
 
 
@@ -33,12 +37,17 @@ GET requests
 app.get("/searchUsers/", function(request, response) {
     const body = request.body
     let foundUsers = []
-
     db.getUsers().then(users => {
         for (key in body) {
-            foundUsers.push(users.filter(u => u[key] == body[key]))
+            users.filter(u => {
+                if(u[key] == body[key]) {
+                    foundUsers.push(u);
+                }
+            })
+            // foundUsers.push(users.filter(u => u[key] == body[key]))
         }
-        console.log(foundUsers)
+        foundUsers
+        console.log('found users: ', foundUsers)
     })
 })
 
