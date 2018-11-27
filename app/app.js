@@ -7,7 +7,7 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: false })) // Set bodyparser to JSON? Need to look this up
 
 // Re-route all paths to our routing file
-// app.use("/", routes);
+app.use("/", routes);
 
 
 app.listen(8080, () => {
@@ -164,3 +164,4 @@ app.delete("/users/:id", function(request, response) {
         response.status(204).json("User with ID " + request.params.id + " was deleted")
     ).catch(error => response.status(500).json("There was an error with DELETE users/" + request.params.id))
 })
+=======

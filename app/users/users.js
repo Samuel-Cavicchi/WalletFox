@@ -15,4 +15,7 @@ routes.get("/:id", function (request, response) {
     // } else {
     //     response.status(400).end(); // If wallet does not exist, return 400 Bad Request
     // }
+
 })
+
+module.exports = routes;
