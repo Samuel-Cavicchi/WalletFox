@@ -1,4 +1,5 @@
 db = require('../database.js');
+auth = require('../auth.js');
 const routes = require("express").Router();
 
 // TODO: Perhaps return error if trying to patch id?
@@ -27,6 +28,20 @@ routes.delete("/:id", function(request, response) {
 // Requesting a specific user ID
 routes.get("/:id", function (request, response) {
     const id = request.params.id
+    const authToken = request.query.token;
+    if(authToken) {
+        auth.checkToken().then(tokenData => {
+            if(tokenData.sub === id) {
+                // User has sufficient access for this information
+            } else {
+                // Another user is requesting this user's public information
+            }
+        }).catch(err => {
+            response.status(401).json(err) // Bad auth token
+        })
+    } else {
+        response.status(401).json('No auth token provided in query parameters') // No auth token
+    }
     db.getUser(id).then(user =>
         response.status(200).json(user) // Return the specific wallet with 200 OK
     ).catch(error => response.status(404).json(error.message))
@@ -44,14 +59,15 @@ routes.get("", function (request, response) {
 
 routes.post("", function (request, response) {
     const userToAdd = request.body
-
-    const users = db.getUsers().then(users => {
-        userToAdd.id = users[users.length - 1].id + 1
-        db.addUser(userToAdd)
-        response.status(201).json("Location: users/" + userToAdd.id)
-    }).catch(error => {
-        response.status(500).end("There was an error with post/users :(")
-    })
+    var token = auth.createToken(userToAdd.name)
+    response.status(201).json(token)
+    // const users = db.getUsers().then(users => {
+    //     userToAdd.id = users[users.length - 1].id + 1
+    //     db.addUser(userToAdd)
+    //     response.status(201).json("Location: users/" + userToAdd.id)
+    // }).catch(error => {
+    //     response.status(500).end("There was an error with post/users :(")
+    // })
 })
 
 module.exports = routes;

@@ -14,5 +14,5 @@ routes.use('/wallets', require('./wallets/wallets.js'))
 routes.use('/wallet-debts', require('./wallet-debts/wallet-debts.js'))
 routes.use('/payments', require('./payments/payments.js'))
 routes.use('/payment-debts', require('./payment-debts/payment-debts.js'))
-
+routes.use('/auth', require('./auth.js'))
 module.exports = routes;

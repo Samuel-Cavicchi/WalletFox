@@ -45,8 +45,8 @@ const usersTable = [
 ]
 
 function getUsers() {
-    return new Promise(function(resolve, reject) {
-        if(usersTable != null) {
+    return new Promise(function (resolve, reject) {
+        if (usersTable != null) {
             resolve(usersTable)
         } else {
             reject(new Error('No User\'s table found'))
@@ -61,9 +61,9 @@ function addUser(user) {
 
 // Get specific user
 function getUser(userId) {
-    return new Promise(function(resolve, reject) {
+    return new Promise(function (resolve, reject) {
         const user = usersTable.find(user => user.id == userId)
-        if(user) {
+        if (user) {
             resolve(user)
         } else {
             reject(new Error('Error: User with this ID not found'))
@@ -72,18 +72,21 @@ function getUser(userId) {
 }
 
 function deleteUser(userId) {
-    var userToRemove = getUser(userId)
-    usersTable.splice(userToRemove, 1)
-
-    return new Promise(function(resolve, reject) {
-        getUser(userId).then(
-            reject(new Error("Error: The user with ID", userId, "is still in the database"))
-        ).catch(resolve)
+    return new Promise(function (resolve, reject) {
+        getUser(userId).then(() => {
+            // If user is found
+            var userToRemove = getUser(userId)
+            usersTable.splice(userToRemove, 1) // Delete from database
+            resolve() // deleted user successfully
+            // reject(new Error("Error: The user with ID", userId, "is still in the database"))
+        }).catch(() => {
+            reject(new Error("User not found"))
+        })
     })
 }
 
 function getWallets() {
-    return new Promise(function(resolve, reject) {
+    return new Promise(function (resolve, reject) {
         if (walletsTable != null) {
             resolve(walletsTable)
         } else {
@@ -97,7 +100,7 @@ function addWallet(wallet) {
 }
 
 function getWallet(walletId) {
-    return new Promise(function(resolve, reject) {
+    return new Promise(function (resolve, reject) {
         const wallet = walletsTable.find(wallet => wallet.id == walletId)
         if (wallet) {
             resolve(wallet)
@@ -108,7 +111,7 @@ function getWallet(walletId) {
 }
 
 function getPayment(paymentId) {
-    return new Promise(function(resolve, reject) { 
+    return new Promise(function (resolve, reject) {
         const payment = paymentsTable.find(payment => payment.id == paymentId)
         if (payment) {
             resolve(payment)
@@ -119,7 +122,7 @@ function getPayment(paymentId) {
 }
 
 function getPaymentDebt(paymentDebtId) {
-    return new Promise(function(resolve, reject) {
+    return new Promise(function (resolve, reject) {
         const debt = paymentDebtsTable.find(debt => debt.id == paymentDebtId)
         if (debt) {
             resolve(debt)
