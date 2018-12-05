@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/Samuel-Cavicchi/WalletFox#readme",
   "dependencies": {
+    "aws-sdk": "^2.370.0",
     "body-parser": "^1.18.3",
     "express": "^4.16.4",
     "jsonwebtoken": "^8.4.0"
