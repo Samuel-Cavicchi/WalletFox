@@ -33,7 +33,6 @@ function createToken(userId) {
         iss: 'localhost:8080'
     }
     var token = jwt.sign(claims, 'secret')
-    console.log('Created token:', token)
     return token
 }
 

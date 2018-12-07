@@ -82,10 +82,16 @@ const usersTable = [
     }
 ]
 
-function getUsers() {
+function getUsers(name) {
+    var query = ""
+    var values = null
+    if(name) {
+        query = "SELECT * FROM users WHERE name = ?"
+        values = [name]
+    } else {
+        query = "SELECT * FROM users"
+    }
     return new Promise(function (resolve, reject) {
-        const query = "SELECT * FROM users"
-        const values = null;
         connection.query(query, values, function(error, result) {
             if(error) {
                 reject(error)

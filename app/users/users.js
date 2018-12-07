@@ -1,5 +1,6 @@
 db = require('../database.js');
 auth = require('../auth.js');
+reqhandler = require('../request-handler.js');
 const routes = require("express").Router();
 
 // TODO: Perhaps return error if trying to patch id?
@@ -49,18 +50,26 @@ routes.get("/:id", function (request, response) {
 
 
 
-routes.get("", function (request, response) {
-
-    db.getUsers().then(users => 
-        response.status(200).json(users) // Return all users
-    ).catch(error => response.status(404).json(error.message))
+routes.get("", function (req, res) {
+    db.getUsers(req.query.name).then(users => {
+        users.forEach(function(user) { // Remove sensitive data
+            delete user.password
+            delete user.email
+        })
+        res.status(200).json(users) // Return all users
+    }).catch(error => res.status(404).json(error.message))
 })
 
 // Create a new user
 routes.post("", function (req, res) {
     const userToAdd = req.body
-    console.log('request body: ', req.body)
-    // TODO: Check if all parameters are present
+    const missingParameters = reqhandler.checkRequestParams(['email', 'password', 'name'], req.body)
+    if(missingParameters) {
+        // If the request is missing parameters
+        res.status(400).json(missingParameters)
+        return
+    }
+
     db.addUser(userToAdd).then(result => {
         const userId = result.insertId;
         const token = auth.createToken(userId)

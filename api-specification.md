@@ -158,15 +158,14 @@ Automatically deletes all the specified user's data except the user id and isAct
 
   | Name | Located in | Description | Required | Schema |
   | ---- | ---------- | ----------- | -------- | ---- |
-  | userName | query | Search by the user's name | No | string |
-  | walletId | query | Search by the wallet and return wallet members as user id | No | string |
+  | name | query | Search by the user's name | No | string |
 
   **Responses**
 
   | Code | Description |
   | ---- | ----------- |
   | 200 | Array of search results matching criteria, returns an empty array if none found |
-  | **response body**<br><code> [<br>{ <br> userId: string <br> userName: string <br> profileURL: string <br> }, ... <br>] </code> |
+  | **response body**<br><code> [<br>{ <br> userId: string <br> name: string <br> profileURL: string <br> }, ... <br>] </code> |
   | 400 | Bad Request |
   | 500 | Server error |
 
