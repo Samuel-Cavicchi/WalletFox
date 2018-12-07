@@ -85,15 +85,15 @@ const usersTable = [
 function getUsers(name) {
     var query = ""
     var values = null
-    if(name) {
+    if (name) {
         query = "SELECT * FROM users WHERE name = ?"
         values = [name]
     } else {
         query = "SELECT * FROM users"
     }
     return new Promise(function (resolve, reject) {
-        connection.query(query, values, function(error, result) {
-            if(error) {
+        connection.query(query, values, function (error, result) {
+            if (error) {
                 reject(error)
             } else {
                 resolve(result)
@@ -106,12 +106,10 @@ function addUser(user) {
     return new Promise(function (resolve, reject) {
         const query = "INSERT INTO users (email, password, name, isActive) VALUES (?, ?, ?, ?)"
         const values = [user.email, user.password, user.name, true]
-        connection.query(query, values, function(error, result) {
-            if(error) {
-                console.log('error adding user:', error)
+        connection.query(query, values, function (error, result) {
+            if (error) {
                 reject(error)
             } else {
-                console.log('adding user:', result)
                 resolve(result)
             }
         })
@@ -121,13 +119,45 @@ function addUser(user) {
 
 // Get specific user
 function getUser(userId) {
+    const query = `
+        SELECT *
+        FROM users
+        WHERE userId = ?
+    `
+    const values = [userId]
     return new Promise(function (resolve, reject) {
-        const user = usersTable.find(user => user.id == userId)
-        if (user) {
-            resolve(user)
-        } else {
-            reject(new Error('Error: User with this ID not found'))
-        }
+        connection.query(query, values, function (error, result) {
+            if (error) {
+                reject(error)
+            } else {
+                resolve(result[0])
+            }
+        })
+    })
+}
+
+function updateUser(userId, updatedObject) {
+    var query = `
+        UPDATE users
+        SET email = ?, name = ?, password = ?, imageURL = ?
+        WHERE userId = ?
+    `
+    var values = [
+        updatedObject.email,
+        updatedObject.name,
+        updatedObject.password,
+        updatedObject.imageURL,
+        userId
+    ]
+
+    return new Promise(function (resolve, reject) {
+        connection.query(query, values, function (error, result) {
+            if (error) {
+                reject(error)
+            } else {
+                resolve(result)
+            }
+        })
     })
 }
 
@@ -195,6 +225,7 @@ function getPaymentDebt(paymentDebtId) {
 exports.getUsers = getUsers
 exports.addUser = addUser
 exports.getUser = getUser
+exports.updateUser = updateUser
 exports.deleteUser = deleteUser
 exports.getWallets = getWallets
 exports.addWallet = addWallet

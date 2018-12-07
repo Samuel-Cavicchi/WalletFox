@@ -15,15 +15,19 @@ Documentation for the WalletFox Platform API.
   - 204
     - Successful delete operation, no content response.
   - 400
-    - Bad request, the parameters provided are either not following the specified format (type) or there are some required request parameters that are missing in the request. Returns a json object of the incorrect parameter(s). Example:
+    - Bad request, the parameters provided are either not following the specified format (type) or there are some required request parameters that are missing in the request. Returns a json object of the missing parameter(s). Example:
     ```
-    {
-      [
-        userId,
-        email,
-        walletId...
-      ]
+{
+    "missingParameters": {
+        "body": [
+            "email",
+            "name"
+        ],
+        "path": [
+          "userId"
+        ]
     }
+}
     ```
   - 401
     - Unauthorised. Returns error code 'bad token' if the provided token could not be verified. Returns 'unauthorised' if the token is okay but the user does not have access to that resource.
