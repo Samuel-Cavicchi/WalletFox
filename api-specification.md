@@ -315,7 +315,104 @@ Automatically deletes all the specified user's data except the user id and isAct
 | 404 | Wallet not found |
 | 500 | Server error |
 
-# /payments
+# /wallet-members
+  ### ***GET***
+  **Summary:** Search through wallet members
+
+  **Description:** Search through all wallet members given the correct search parameters, and return a select few results
+
+  **Parameters**
+
+  | Name | Located in | Description | Required | Schema |
+  | ---- | ---------- | ----------- | -------- | ---- |
+  | walletId | query | Find the wallet members for the specified wallet id  | No | integer |
+  | userId | query | Find the wallet members for the specified user id  | No | integer |
+  | token | body | Authentication token | Yes | string |
+
+  **Responses**
+
+  | Code | Description |
+  | ---- | ----------- |
+  | 200 | Returns an array of all wallet members matching the criteria supplied, returns empty if none found |
+  | 400 | Bad Request |
+  | 401 | Unauthorised |
+  | 500 | Server error |
+
+  ### ***POST***
+**Summary:** Adds a wallet member
+
+**Description:** Adds an existing user to a specific wallet. Wallet Members can create new wallet members, only wallet member admins can create new wallet member admins.
+
+
+**Parameters**
+
+| Name | Located in | Description | Required | Schema |
+| ---- | ---------- | ----------- | -------- | ---- |
+| userId | query | The user id to be added as a wallet member | Yes | integer |
+| token | body | Authentication token | Yes | string |
+
+**Responses**
+
+| Code | Description |
+| ---- | ----------- |
+| 201 | Wallet member created |
+| 400 | Bad Request |
+| 401 | Unauthorised |
+| 409 | This user is already a member of this wallet |
+| 500 | Server error |
+
+# /wallet-members/{walletMemberId}
+  ### ***PATCH***
+  **Summary:** Update a wallet member
+
+  **Description:** Updates a wallet member, usually used to create a wallet admin or remove admin privileges.
+
+  Only a current wallet member with admin privileges can patch wallet members
+
+
+  **Parameters**
+
+  | Name | Located in | Description | Required | Schema |
+  | ---- | ---------- | ----------- | -------- | ---- |
+  | walletMemberId | path | The wallet member id | Yes | integer |
+  | token | body | Authentication token | Yes | string |
+
+  **Responses**
+
+  | Code | Description |
+  | ---- | ----------- |
+  | 204 | Debt updated updated, no content |
+  | 400 | Bad Request |
+  | 401 | Unauthorised |
+  | 404 | Wallet Debt not found |
+  | 500 | Server error |
+
+  ### ***DELETE***
+**Summary:** Remove a user from a wallet
+
+**Description:** Delete a wallet member. If this member is the last of the wallet members, the wallet will be automatically deleted. Only the user can delete themselves, however wallet member admins can delete other wallet members.
+
+
+**Parameters**
+
+| Name | Located in | Description | Required | Schema |
+| ---- | ---------- | ----------- | -------- | ---- |
+| walletMemberId | path | The wallet member's unique ID | Yes | integer |
+| token | body | Authentication token | Yes | string |
+
+**Responses**
+
+| Code | Description |
+| ---- | ----------- |
+| 204 | Deleted, no content |
+| 400 | Bad Request |
+| 401 | Unauthorised |
+| 404 | Wallet member not found |
+| 500 | Server error | -->
+
+
+
+<!-- # /payments
   ### ***GET***
   **Summary:** Search through payments
 
@@ -429,7 +526,7 @@ Only the payee can initiate this request
 
 
 
-<!-- 
+
 # /payment-debts
   ### ***GET***
   **Summary:** Search through payment debts
@@ -609,98 +706,5 @@ Only the userToBePaid can update the wallet debt value / mark it has paid
 | 401 | Unauthorised |
 | 404 | Wallet Debt not found |
 | 500 | Server error |
-
-# /wallet-members
-  ### ***GET***
-  **Summary:** Search through wallet members
-
-  **Description:** Search through all wallet members given the correct search parameters, and return a select few results
-
-  **Parameters**
-
-  | Name | Located in | Description | Required | Schema |
-  | ---- | ---------- | ----------- | -------- | ---- |
-  | walletId | query | Find the wallet members for the specified wallet id  | No | integer |
-  | userId | query | Find the wallet members for the specified user id  | No | integer |
-  | token | body | Authentication token | Yes | string |
-
-  **Responses**
-
-  | Code | Description |
-  | ---- | ----------- |
-  | 200 | Returns an array of all wallet members matching the criteria supplied, returns empty if none found |
-  | 400 | Bad Request |
-  | 401 | Unauthorised |
-  | 500 | Server error |
-
-  ### ***POST***
-**Summary:** Adds a wallet member
-
-**Description:** Adds an existing user to a specific wallet. Wallet Members can create new wallet members, only wallet member admins can create new wallet member admins.
-
-
-**Parameters**
-
-| Name | Located in | Description | Required | Schema |
-| ---- | ---------- | ----------- | -------- | ---- |
-| userId | query | The user id to be added as a wallet member | Yes | integer |
-| token | body | Authentication token | Yes | string |
-
-**Responses**
-
-| Code | Description |
-| ---- | ----------- |
-| 201 | Wallet member created |
-| 400 | Bad Request |
-| 401 | Unauthorised |
-| 409 | This user is already a member of this wallet |
-| 500 | Server error |
-
-# /wallet-members/{walletMemberId}
-  ### ***PATCH***
-  **Summary:** Update a wallet member
-
-  **Description:** Updates a wallet member, usually used to create a wallet admin or remove admin privileges.
-
-  Only a current wallet member with admin privileges can patch wallet members
-
-
-  **Parameters**
-
-  | Name | Located in | Description | Required | Schema |
-  | ---- | ---------- | ----------- | -------- | ---- |
-  | walletMemberId | path | The wallet member id | Yes | integer |
-  | token | body | Authentication token | Yes | string |
-
-  **Responses**
-
-  | Code | Description |
-  | ---- | ----------- |
-  | 204 | Debt updated updated, no content |
-  | 400 | Bad Request |
-  | 401 | Unauthorised |
-  | 404 | Wallet Debt not found |
-  | 500 | Server error |
-
-  ### ***DELETE***
-**Summary:** Remove a user from a wallet
-
-**Description:** Delete a wallet member. If this member is the last of the wallet members, the wallet will be automatically deleted. Only the user can delete themselves, however wallet member admins can delete other wallet members.
-
-
-**Parameters**
-
-| Name | Located in | Description | Required | Schema |
-| ---- | ---------- | ----------- | -------- | ---- |
-| walletMemberId | path | The wallet member's unique ID | Yes | integer |
-| token | body | Authentication token | Yes | string |
-
-**Responses**
-
-| Code | Description |
-| ---- | ----------- |
-| 204 | Deleted, no content |
-| 400 | Bad Request |
-| 401 | Unauthorised |
-| 404 | Wallet member not found |
-| 500 | Server error | -->
+ -->
+w

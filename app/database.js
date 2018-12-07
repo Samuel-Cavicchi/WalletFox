@@ -1,5 +1,4 @@
 const mysql = require("mysql")
-
 const connection = mysql.createConnection({
     host: "test.cnywqzoih3zx.eu-central-1.rds.amazonaws.com",
     database: "test",
@@ -25,6 +24,15 @@ connection.query(`
     )`
 );
 connection.query(`
+    CREATE TABLE IF NOT EXISTS wallet_members (
+        walletMemberId INT AUTO_INCREMENT PRIMARY KEY,
+        userId INT,
+        walletId INT,
+        FOREIGN KEY (userId) REFERENCES users(userId),
+        FOREIGN KEY (walletId) REFERENCES wallets(walletId)
+    )`
+);
+connection.query(`
     CREATE TABLE IF NOT EXISTS payments (
         paymentId INT AUTO_INCREMENT PRIMARY KEY,
         description VARCHAR(50),
@@ -37,50 +45,6 @@ connection.query(`
     )`
 );
 
-const walletsTable = [
-    {
-        id: 1,
-        name: "Sam's Wallet",
-        currency: "SEK"
-    },
-    {
-        id: 2,
-        name: "Group House",
-        currency: "AUD"
-    }
-]
-
-const paymentsTable = [ // A list of all payments
-    {
-        id: 1,
-        wallet: 2, // Wallet ID
-        payee: 1324, // uid of the person who is owed money
-        description: "Bought lunch",
-        paymentDate: new Date().valueOf()
-    }
-]
-
-const paymentDebtsTable = [
-    {
-        id: 1,
-        userOwing: 1333, // The user who must pay money
-        payment: 1, // The corresponding payment (which includes the payee)
-        amount: 60.0
-    }
-]
-
-const usersTable = [
-    {
-        id: 0,
-        name: 'Josef Wakman',
-        password: 'randomhash'
-    },
-    {
-        id: 1,
-        name: 'Samuel Cavicchi',
-        password: 'randomhash'
-    }
-]
 
 function getUsers(name) {
     var query = ""
@@ -116,8 +80,6 @@ function addUser(user) {
     })
 }
 
-
-// Get specific user
 function getUser(userId) {
     const query = `
         SELECT *
@@ -168,8 +130,8 @@ function deleteUser(userId) {
     `
     const values = [userId]
     return new Promise(function (resolve, reject) {
-        connection.query(query, values, function(error, result) {
-            if(error) {
+        connection.query(query, values, function (error, result) {
+            if (error) {
                 reject(error)
             } else {
                 resolve(result)
@@ -178,50 +140,165 @@ function deleteUser(userId) {
     })
 }
 
-function getWallets() {
+
+function addWalletMember(userId, walletId) {
     return new Promise(function (resolve, reject) {
-        if (walletsTable != null) {
-            resolve(walletsTable)
-        } else {
-            reject(new Error("No wallets table found!"))
-        }
+        const query = "INSERT INTO users (userId, walletId) VALUES (?, ?)"
+        const values = [userId, walletId]
+        connection.query(query, values, function (error, result) {
+            if (error) {
+                reject(error)
+            } else {
+                resolve(result)
+            }
+        })
     })
 }
 
-function addWallet(wallet) {
-    walletsTable.push(wallet)
-}
-
-function getWallet(walletId) {
+function getWalletMember(walletMemberId) {
+    const query = `
+        SELECT *
+        FROM wallet_members
+        WHERE walletMemberId = ?
+    `
+    const values = [walletMemberId]
     return new Promise(function (resolve, reject) {
-        const wallet = walletsTable.find(wallet => wallet.id == walletId)
-        if (wallet) {
-            resolve(wallet)
-        } else {
-            reject(new Error('Error: Wallet with this ID not found'))
-        }
+        connection.query(query, values, function (error, result) {
+            if (error) {
+                reject(error)
+            } else {
+                resolve(result[0])
+            }
+        })
     })
 }
 
-function getPayment(paymentId) {
+function updateWalletMember(walletMemberId, isAdmin) {
+    var query = `
+        UPDATE wallet_members
+        SET isAdmin = ?
+        WHERE walletMemberId = ?
+    `
+    var values = [isAdmin, walletMemberId]
+
     return new Promise(function (resolve, reject) {
-        const payment = paymentsTable.find(payment => payment.id == paymentId)
-        if (payment) {
-            resolve(payment)
-        } else {
-            reject(new Error('Error: Payment with this ID not found'))
-        }
+        connection.query(query, values, function (error, result) {
+            if (error) {
+                reject(error)
+            } else {
+                resolve(result)
+            }
+        })
     })
 }
 
-function getPaymentDebt(paymentDebtId) {
+function deleteWalletMember(walletMemberId) {
+    const query = `
+        DELETE FROM wallet_members
+        WHERE walletMemberId = ?
+    `
+    const values = [walletMemberId]
     return new Promise(function (resolve, reject) {
-        const debt = paymentDebtsTable.find(debt => debt.id == paymentDebtId)
-        if (debt) {
-            resolve(debt)
-        } else {
-            reject(new Error('Error: PaymentDebt with this ID not found'))
-        }
+        connection.query(query, values, function (error, result) {
+            if (error) {
+                reject(error)
+            } else {
+                resolve(result)
+            }
+        })
+    })
+}
+
+
+// To Complete:
+function getWallets(id) {
+    var query = `SELECT * FROM wallets, users, wallet_members
+        WHERE walletId = wallet_members.walletId, 
+        AND wallet_members.userId = users.userId
+        AND users.userId = ?`
+    var values = [id]
+    return new Promise(function (resolve, reject) {
+        connection.query(query, values, function (error, result) {
+            if (error) {
+                reject(error)
+            } else {
+                resolve(result)
+            }
+        })
+    })
+}
+// To Complete:
+function addWallet(user) {
+    return new Promise(function (resolve, reject) {
+        const query = "INSERT INTO users (email, password, name, isActive) VALUES (?, ?, ?, ?)"
+        const values = [user.email, user.password, user.name, true]
+        connection.query(query, values, function (error, result) {
+            if (error) {
+                reject(error)
+            } else {
+                resolve(result)
+            }
+        })
+    })
+}
+// To Complete:
+function getWallet(userId) {
+    const query = `
+        SELECT *
+        FROM users
+        WHERE userId = ?
+    `
+    const values = [userId]
+    return new Promise(function (resolve, reject) {
+        connection.query(query, values, function (error, result) {
+            if (error) {
+                reject(error)
+            } else {
+                resolve(result[0])
+            }
+        })
+    })
+}
+// To Complete:
+function updateWallet(userId, updatedObject) {
+    var query = `
+        UPDATE users
+        SET email = ?, name = ?, password = ?, imageURL = ?
+        WHERE userId = ?
+    `
+    var values = [
+        updatedObject.email,
+        updatedObject.name,
+        updatedObject.password,
+        updatedObject.imageURL,
+        userId
+    ]
+
+    return new Promise(function (resolve, reject) {
+        connection.query(query, values, function (error, result) {
+            if (error) {
+                reject(error)
+            } else {
+                resolve(result)
+            }
+        })
+    })
+}
+// To Complete:
+function deleteWallet(userId) {
+    const query = `
+        DELETE FROM users
+        WHERE userId = ?
+    `
+    const values = [userId]
+    return new Promise(function (resolve, reject) {
+        connection.query(query, values, function (error, result) {
+            if (error) {
+                reject(error)
+            } else {
+                resolve(result)
+            }
+        })
     })
 }
 
@@ -230,8 +307,14 @@ exports.addUser = addUser
 exports.getUser = getUser
 exports.updateUser = updateUser
 exports.deleteUser = deleteUser
+
+exports.addWalletMember = addWalletMember
+exports.getWalletMember = getWalletMember
+exports.updateWalletMember = updateWalletMember
+exports.deleteWalletMember = deleteWalletMember
+
 exports.getWallets = getWallets
 exports.addWallet = addWallet
 exports.getWallet = getWallet
-exports.getPayment = getPayment
-exports.getPaymentDebt = getPaymentDebt
+exports.updateWallet = updateWallet
+exports.deleteWallet = deleteWallet
