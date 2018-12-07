@@ -56,18 +56,19 @@ routes.get("", function (request, response) {
     ).catch(error => response.status(404).json(error.message))
 })
 
-
-routes.post("", function (request, response) {
-    const userToAdd = request.body
-    var token = auth.createToken(userToAdd.name)
-    response.status(201).json(token)
-    // const users = db.getUsers().then(users => {
-    //     userToAdd.id = users[users.length - 1].id + 1
-    //     db.addUser(userToAdd)
-    //     response.status(201).json("Location: users/" + userToAdd.id)
-    // }).catch(error => {
-    //     response.status(500).end("There was an error with post/users :(")
-    // })
+// Create a new user
+routes.post("", function (req, res) {
+    const userToAdd = req.body
+    console.log('request body: ', req.body)
+    // TODO: Check if all parameters are present
+    db.addUser(userToAdd).then(result => {
+        const userId = result.insertId;
+        const token = auth.createToken(userId)
+        res.setHeader('Location', '/users/' + userId)
+        res.status(201).json(token)
+    }).catch(error => {
+        res.status(500).json(error)
+    });
 })
 
 module.exports = routes;

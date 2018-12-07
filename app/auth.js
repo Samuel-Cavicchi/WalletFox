@@ -53,6 +53,6 @@ function checkToken(token) {
     })
 }
 
-exports.createToken = createToken
-exports.checkToken = checkToken
 module.exports = routes
+module.exports.checkToken = checkToken
+module.exports.createToken = createToken

@@ -1,3 +1,41 @@
+const mysql = require("mysql")
+
+const connection = mysql.createConnection({
+    host: "test.cnywqzoih3zx.eu-central-1.rds.amazonaws.com",
+    database: "test",
+    user: "test",
+    password: "justtesting"
+});
+
+connection.query(`
+    CREATE TABLE IF NOT EXISTS users (
+        userId INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(50),
+        email VARCHAR(100),
+        password VARCHAR(100),
+        isActive BOOLEAN,
+        imageURL VARCHAR(100)
+    )`
+);
+connection.query(`
+    CREATE TABLE IF NOT EXISTS wallets (
+        walletId INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(50),
+        currency VARCHAR(20)
+    )`
+);
+connection.query(`
+    CREATE TABLE IF NOT EXISTS payments (
+        paymentId INT AUTO_INCREMENT PRIMARY KEY,
+        description VARCHAR(50),
+        paymentDate VARCHAR(100),
+        isSettled BOOLEAN,
+        walletId INT,
+        payeeId INT,
+        FOREIGN KEY (walletId) REFERENCES wallets(walletId) ON DELETE CASCADE,
+        FOREIGN KEY (payeeId) REFERENCES users(userId)
+    )`
+);
 
 const walletsTable = [
     {
@@ -46,16 +84,32 @@ const usersTable = [
 
 function getUsers() {
     return new Promise(function (resolve, reject) {
-        if (usersTable != null) {
-            resolve(usersTable)
-        } else {
-            reject(new Error('No User\'s table found'))
-        }
+        const query = "SELECT * FROM users"
+        const values = null;
+        connection.query(query, values, function(error, result) {
+            if(error) {
+                reject(error)
+            } else {
+                resolve(result)
+            }
+        })
     })
 }
 
 function addUser(user) {
-    usersTable.push(user)
+    return new Promise(function (resolve, reject) {
+        const query = "INSERT INTO users (email, password, name, isActive) VALUES (?, ?, ?, ?)"
+        const values = [user.email, user.password, user.name, true]
+        connection.query(query, values, function(error, result) {
+            if(error) {
+                console.log('error adding user:', error)
+                reject(error)
+            } else {
+                console.log('adding user:', result)
+                resolve(result)
+            }
+        })
+    })
 }
 
 

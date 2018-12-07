@@ -4,7 +4,9 @@ Documentation for the WalletFox Platform API.
 ## Using this documentation
 - PATCH requests
   - Not all model parameters are required in the request body, only the values you wish to update.
-
+- Dates
+  - All dates are integer values represting the number of milliseconds between 1 January 1970 00:00:00 UTC and the given date. eg: 
+  ``` 823230245000 ```
 
 ### Common Response Codes
   - 200
@@ -23,13 +25,15 @@ Documentation for the WalletFox Platform API.
       ]
     }
     ```
+  - 401
+    - Unauthorised. Returns error code 'bad token' if the provided token could not be verified. Returns 'unauthorised' if the token is okay but the user does not have access to that resource.
   - 404
-    - The requested resource could not be found
+    - The requested resource could not be found.
   - 500
     - Nothing was wrong with the request, however, there was a server error with the back-end application.
 
 ### Authentication
-This api uses JSON Web Tokens (JWT) which will be referred to as 'tokens' within the request body parameters.
+This api uses JSON Web Tokens (JWT) which will be referred to as 'token' within the request/response body parameters.
 
 
 # /auth
@@ -171,6 +175,15 @@ Automatically deletes all the specified user's data except the user id and isAct
 
 **Description:** Creates a new user on the database
 
+
+**Parameters**
+
+| Name | Located in | Description | Required | Schema |
+| ---- | ---------- | ----------- | -------- | ---- |
+| email | body | The user's email | Yes | string |
+| password | body | The user's password | Yes | string |
+| name | body | The user's name | Yes | string |
+| imageURL | body | The user's uploaded profile image | No | string
 **Responses**
 
 | Code | Description |
@@ -206,13 +219,15 @@ Automatically deletes all the specified user's data except the user id and isAct
   ### ***POST***
 **Summary:** Create a new wallet
 
-**Description:** Adds a new wallet to the database and automatically creates the wallet member relation for the user.
+**Description:** Adds a new wallet to the database and automatically creates the wallet member relation for the user. The wallet member is automatically a wallet admin.
 
 **Parameters**
 
 | Name | Located in | Description | Required | Schema |
 | ---- | ---------- | ----------- | -------- | ---- |
 | token | body | Authentication token | Yes | string |
+| name | body | Wallet's name | Yes | string |
+| currency | body | The Wallet's currency | Yes | string |
 
 
 **Responses**
@@ -243,7 +258,7 @@ Automatically deletes all the specified user's data except the user id and isAct
   | ---- | ----------- |
   | 200 | OK | 
   | **response body:** | <code> walletId: integer <br> name: string <br> currency: string </code>
-  | 401 | Not a member of this wallet or not logged in|
+  | 401 | Unauthorised |
   | 404 | Wallet does not exist |
   | 500 | Server error |
 
@@ -251,8 +266,6 @@ Automatically deletes all the specified user's data except the user id and isAct
   **Summary:** Update a wallet's information
 
   **Description:** Update a specific wallet's information by supplying the wallet id in the request path, and by supplying the updated values in the request body.
-
-  **Not all model parameters are required in the request body, only the values you wish to update.**
 
   Only a wallet member who is admin may change a wallet's information
 
@@ -263,7 +276,9 @@ Automatically deletes all the specified user's data except the user id and isAct
   | ---- | ---------- | ----------- | -------- | ---- |
   | walletId | path | The wallet's unique ID | Yes | integer |
   | token | body | Authentication token | Yes | string |
-
+  | name | body | Wallet's name | No | string |
+  | currency | body | The Wallet's currency | No | string |
+  
   **Responses**
 
   | Code | Description |
@@ -297,6 +312,121 @@ Automatically deletes all the specified user's data except the user id and isAct
 | 404 | Wallet not found |
 | 500 | Server error |
 
+# /payments
+  ### ***GET***
+  **Summary:** Search through payments
+
+  **Description:** Search for payments by passing through the correct search parameters
+
+  **Parameters**
+
+  | Name | Located in | Description | Required | Schema |
+  | ---- | ---------- | ----------- | -------- | ---- |
+  | walletId | query | The id of the wallet in which the payment was made | No | string |
+  | payee | query | The user id of the user who made the payment | No | string |
+  | token | body | Authentication token | Yes | string |
+
+
+  **Responses**
+
+  | Code | Description |
+  | ---- | ----------- |
+  | 200 | Array of all payments matching criteria, returns empty if none found |
+  | **response body**<br><code> [<br>{ <br> paymentId: integer <br> walletId: integer <br> payeeId: integer <br> description: string <br> paymentDate: date <br> isSettled: boolean <br>  }, ... <br>] </code> |
+  | 400 | Bad Request |
+  | 401 | Unauthorized |
+  | 404 | Payment not found |
+  | 500 | Server error |
+
+  ### ***POST***
+**Summary:** Create a new payment
+
+**Description:** Adds a new payment to a specified wallet.
+
+The front-end application will create the corresponding payment debts, as the payment does not hold any money values. If the front-end application fails to do this, the payment will be ignored when creating wallet-debts through /wallet-debts POST method. 
+
+**Parameters**
+
+| Name | Located in | Description | Required | Schema |
+| ---- | ---------- | ----------- | -------- | ---- |
+| walletId | query | The id of the wallet in which the payment was made | Yes | integer |
+| payeeId | body | The user id of the user who made the payment | Yes | integer |
+| token | body | Authentication token | Yes | string |
+| description | body | Payment Description | No | string |
+| paymentDate | body | Payment Date | Yes | integer |
+
+**Responses**
+
+| Code | Description |
+| ---- | ----------- |
+| 201 | Payment created |
+| 400 | Bad Request |
+| 401 | Unauthorized |
+| 500 | Server error |
+
+# /payments/{paymentId}
+  ### ***DELETE***
+**Summary:** Delete a payment
+
+**Description:** Deletes a specific payment from a wallet. Only the payee can initiate this request
+
+
+**Parameters**
+
+| Name | Located in | Description | Required | Schema |
+| ---- | ---------- | ----------- | -------- | ---- |
+| paymentId | path | The payment id of the payment to be deleted | Yes | integer |
+| token | body | Authentication token | Yes | string |
+
+**Responses**
+
+| Code | Description |
+| ---- | ----------- |
+| 204 | Payment deleted, no content |
+| 400 | Bad Request |
+| 401 | Unauthorised |
+| 404 | Payment not found |
+| 500 | Server error |
+
+  ### ***PATCH***
+**Summary:** Update a payment
+
+**Description:** Update a specific payment's information by supplying the payment id in the request path, and by supplying the updated values in the request body.
+
+**Not all model parameters are required in the request body, only the values you wish to update.**
+
+Only the payee can initiate this request
+
+
+**Parameters**
+
+| Name | Located in | Description | Required | Schema |
+| ---- | ---------- | ----------- | -------- | ---- |
+| paymentId | path | The payment id of the payment to be updated | Yes | integer |
+| payee | body | The user id of the user who made the payment | No | string |
+| token | body | Authentication token | Yes | string |
+| description | body | Payment Description | No | string |
+| paymentdate | body | Payment Date | No | string |
+
+**Responses**
+
+| Code | Description |
+| ---- | ----------- |
+| 204 | Payment updated, no content |
+| 400 | Bad Request |
+| 401 | Unauthorised |
+| 404 | Payment not found |
+| 500 | Server error |
+
+
+
+
+
+
+
+
+
+<!-- 
 # /payment-debts
   ### ***GET***
   **Summary:** Search through payment debts
@@ -399,110 +529,6 @@ Only the payment payee can delete the corresponding payment debt
 | 404 | Payment not found |
 | 500 | Server error |
 
-# /payments
-  ### ***GET***
-  **Summary:** Search through payments
-
-  **Description:** Search for payments by passing through the correct search parameters
-
-  **Parameters**
-
-  | Name | Located in | Description | Required | Schema |
-  | ---- | ---------- | ----------- | -------- | ---- |
-  | walletId | query | The id of the wallet in which the payment was made | No | string |
-  | payee | query | The user id of the user who made the payment | No | string |
-  | token | body | Authentication token | Yes | string |
-
-
-  **Responses**
-
-  | Code | Description |
-  | ---- | ----------- |
-  | 200 | Array of all payments matching criteria, returns empty if none found |
-  | 400 | Bad Request |
-  | 401 | Unauthorized |
-  | 404 | Payment not found |
-  | 500 | Server error |
-
-  ### ***POST***
-**Summary:** Create a new payment
-
-**Description:** Adds a new payment to a specified wallet.
-
-The front-end application will create the corresponding payment debts, as the payment does not hold any money values. If the front-end application fails to do this, the payment will be ignored when creating wallet-debts through /wallet-debts POST method. 
-
-**Parameters**
-
-| Name | Located in | Description | Required | Schema |
-| ---- | ---------- | ----------- | -------- | ---- |
-| walletId | query | The id of the wallet in which the payment was made | No | string |
-| payee | body | The user id of the user who made the payment | No | string |
-| token | body | Authentication token | Yes | string |
-| description | body | Payment Description | Yes | string |
-| paymentdate | body | Payment Date | Yes | string |
-
-**Responses**
-
-| Code | Description |
-| ---- | ----------- |
-| 201 | Payment created |
-| 400 | Bad Request |
-| 401 | Unauthorized |
-| 500 | Server error |
-
-# /payments/{paymentId}
-  ### ***DELETE***
-**Summary:** Delete a payment
-
-**Description:** Deletes a specific payment from a wallet. Only the payee can initiate this request
-
-
-**Parameters**
-
-| Name | Located in | Description | Required | Schema |
-| ---- | ---------- | ----------- | -------- | ---- |
-| paymentId | path | The payment id of the payment to be deleted | Yes | integer |
-| token | body | Authentication token | Yes | string |
-
-**Responses**
-
-| Code | Description |
-| ---- | ----------- |
-| 204 | Payment deleted, no content |
-| 400 | Bad Request |
-| 401 | Unauthorised |
-| 404 | Payment not found |
-| 500 | Server error |
-
-  ### ***PATCH***
-**Summary:** Update a payment
-
-**Description:** Update a specific payment's information by supplying the payment id in the request path, and by supplying the updated values in the request body.
-
-**Not all model parameters are required in the request body, only the values you wish to update.**
-
-Only the payee can initiate this request
-
-
-**Parameters**
-
-| Name | Located in | Description | Required | Schema |
-| ---- | ---------- | ----------- | -------- | ---- |
-| paymentId | path | The payment id of the payment to be updated | Yes | integer |
-| payee | body | The user id of the user who made the payment | No | string |
-| token | body | Authentication token | Yes | string |
-| description | body | Payment Description | No | string |
-| paymentdate | body | Payment Date | No | string |
-
-**Responses**
-
-| Code | Description |
-| ---- | ----------- |
-| 204 | Payment updated, no content |
-| 400 | Bad Request |
-| 401 | Unauthorised |
-| 404 | Payment not found |
-| 500 | Server error |
 
 # /wallet-debts
   ### ***GET***
@@ -674,4 +700,4 @@ Only the userToBePaid can update the wallet debt value / mark it has paid
 | 400 | Bad Request |
 | 401 | Unauthorised |
 | 404 | Wallet member not found |
-| 500 | Server error |
+| 500 | Server error | -->
