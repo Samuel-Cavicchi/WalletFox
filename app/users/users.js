@@ -26,8 +26,6 @@ routes.patch("/:id", function (req, res) {
                 }).catch(() => res.status(500).json("Server error")) // There was an issue updating the user
             }).catch(error => res.status(500).json("Server error")) // There was an issue finding the user
         } else {
-            console.log('user id:', id)
-            console.log('auth id:', authorisedUser.sub)
             res.status(401).json("Unauthorised")
         }
     }).catch(() => {
@@ -37,12 +35,29 @@ routes.patch("/:id", function (req, res) {
 
 })
 
-routes.delete("/:id", function (request, response) {
-    // TODO: Verify that correct permissions are provided in the request
-
-    db.deleteUser(request.params.id).then(() =>
-        response.status(204).json("User with ID " + request.params.id + " was deleted")
-    ).catch(error => response.status(500).json("There was an error with DELETE users/" + request.params.id))
+// Delete a specific user
+routes.delete("/:id", function (req, res) {
+    const missingParameters = reqhandler.checkRequestParams({ request: req, requiredBody: ['token'], })
+    if (missingParameters) {
+        res.status(400).json(missingParameters)
+        return
+    }
+    const id = req.params.id
+    auth.checkToken(req.body.token).then(authorisedUser => {
+        if (authorisedUser.sub == id) {
+            db.getUser(id).then(user => {
+                if (user) {
+                    db.deleteUser(id).then(() =>
+                        res.status(200).json("User with ID " + id + " was deleted")
+                    ).catch(() => res.status(500).json("Server error"))
+                } else {
+                    res.status(404).json("User not found")
+                }
+            }).catch(() => res.status(500).json("Server error"))
+        } else {
+            res.status(401).json("Unauthorised")
+        }
+    }).catch(() => res.status(401).json("Bad token"))
 })
 
 // Requesting a specific user ID
@@ -57,12 +72,15 @@ routes.get("/:id", function (req, res) {
     const id = req.params.id
     auth.checkToken(authToken).then(authorisedUser => {
         db.getUser(id).then(user => {
-            delete user.password
-            if (!authorisedUser.sub === id) {
-                // Another user is requesting this user's public information
-                delete user.email
+            if (user) {
+                delete user.password
+                if (!authorisedUser.sub === id) { // Another user is requesting this user's public information
+                    delete user.email
+                }
+                res.status(200).json(user)
+            } else {
+                res.status(404).json("User not found")
             }
-            res.status(200).json(user)
         }).catch(err => {
             console.log(err)
             res.status(500).json("Server error")

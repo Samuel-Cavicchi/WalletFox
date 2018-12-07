@@ -162,15 +162,18 @@ function updateUser(userId, updatedObject) {
 }
 
 function deleteUser(userId) {
+    const query = `
+        DELETE FROM users
+        WHERE userId = ?
+    `
+    const values = [userId]
     return new Promise(function (resolve, reject) {
-        getUser(userId).then(() => {
-            // If user is found
-            var userToRemove = getUser(userId)
-            usersTable.splice(userToRemove, 1) // Delete from database
-            resolve() // deleted user successfully
-            // reject(new Error("Error: The user with ID", userId, "is still in the database"))
-        }).catch(() => {
-            reject(new Error("User not found"))
+        connection.query(query, values, function(error, result) {
+            if(error) {
+                reject(error)
+            } else {
+                resolve(result)
+            }
         })
     })
 }
