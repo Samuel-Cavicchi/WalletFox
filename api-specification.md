@@ -238,6 +238,7 @@ Automatically deletes all the specified user's data except the user id and isAct
 | Code | Description |
 | ---- | ----------- |
 | 201 | Wallet created |
+|**response body:** | <code>walletMemberId: integer <br> userId: integer <br> walletId: integer</code>
 | 400 | Bad Request |
 | 401 | Not authenticated |
 | 500 | Server error |
@@ -316,28 +317,7 @@ Automatically deletes all the specified user's data except the user id and isAct
 | 500 | Server error |
 
 # /wallet-members
-  ### ***GET***
-  **Summary:** Search through wallet members
-
-  **Description:** Search through all wallet members given the correct search parameters, and return a select few results
-
-  **Parameters**
-
-  | Name | Located in | Description | Required | Schema |
-  | ---- | ---------- | ----------- | -------- | ---- |
-  | walletId | query | Find the wallet members for the specified wallet id  | No | integer |
-  | userId | query | Find the wallet members for the specified user id  | No | integer |
-  | token | body | Authentication token | Yes | string |
-
-  **Responses**
-
-  | Code | Description |
-  | ---- | ----------- |
-  | 200 | Returns an array of all wallet members matching the criteria supplied, returns empty if none found |
-  | 400 | Bad Request |
-  | 401 | Unauthorised |
-  | 500 | Server error |
-
+  
   ### ***POST***
 **Summary:** Adds a wallet member
 
@@ -348,8 +328,9 @@ Automatically deletes all the specified user's data except the user id and isAct
 
 | Name | Located in | Description | Required | Schema |
 | ---- | ---------- | ----------- | -------- | ---- |
-| userId | query | The user id to be added as a wallet member | Yes | integer |
+| userId | body | The user id to be added as a wallet member | Yes | integer |
 | token | body | Authentication token | Yes | string |
+| walletId | body | The id of the wallet that the user is added to | Yes | integer |
 
 **Responses**
 
@@ -362,6 +343,28 @@ Automatically deletes all the specified user's data except the user id and isAct
 | 500 | Server error |
 
 # /wallet-members/{walletMemberId}
+  ### ***GET***
+  **Summary:** Get a wallet member
+
+  **Description:** Get a specific wallet member by providing the wallet member id in the path
+
+  **Parameters**
+
+  | Name | Located in | Description | Required | Schema |
+  | ---- | ---------- | ----------- | -------- | ---- |
+  | walletMemberId | Path | The unique wallet member id | Yes | integer |
+
+
+  **Responses**
+
+  | Code | Description |
+  | ---- | ----------- |
+  | 200 | Returns the found wallet member |
+  | **response body:** | <code> walletMemberId: integer <br> userId: integer <br> walletId: integer </code>
+  | 400 | Bad Request |
+  | 500 | Server error |
+
+
   ### ***PATCH***
   **Summary:** Update a wallet member
 
@@ -707,4 +710,3 @@ Only the userToBePaid can update the wallet debt value / mark it has paid
 | 404 | Wallet Debt not found |
 | 500 | Server error |
  -->
-w

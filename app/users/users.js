@@ -3,7 +3,6 @@ auth = require('../auth.js');
 reqhandler = require('../request-handler.js');
 const routes = require("express").Router();
 
-// TODO: Perhaps return error if trying to patch id?
 routes.patch("/:id", function (req, res) {
     const body = req.body
     const id = req.params.id
