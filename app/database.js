@@ -23,7 +23,6 @@ connection.query(`
         currency VARCHAR(20)
     )`
 );
-connection.query("DROP TABLE wallet_members")
 connection.query(`
     CREATE TABLE IF NOT EXISTS wallet_members (
         walletMemberId INT AUTO_INCREMENT PRIMARY KEY,
@@ -262,7 +261,6 @@ function getWallet(walletId) {
         })
     })
 }
-// To Complete:
 function updateWallet(walletId, updatedObject) {
     var query = `
         UPDATE wallets
@@ -285,7 +283,6 @@ function updateWallet(walletId, updatedObject) {
         })
     })
 }
-// To Complete:
 function deleteWallet(walletId) {
     const query = `
         DELETE FROM wallets
