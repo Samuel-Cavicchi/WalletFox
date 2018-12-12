@@ -2,8 +2,10 @@ db = require('../database.js');
 auth = require('../auth.js');
 reqhandler = require('../request-handler.js');
 const routes = require("express").Router();
+var multer = require("multer")
+var upload = multer({ dest: 'uploads/' })
 
-routes.patch("/:id", function (req, res) {
+routes.patch("/:id", upload.single("image"), function (req, res, next) {
     const body = req.body
     const id = req.params.id
     const missingParameters = reqhandler.checkRequestParams({ request: req, requiredBody: ['token'], })
