@@ -1,29 +1,29 @@
 const jwt = require('jsonwebtoken')
 const routes = require("express").Router();
 const db = require('./database.js')
+const reqhandler = require('./request-handler')
 
 routes.get("", function(req, res) { // GET /auth
+    const missingParameters = reqhandler.checkRequestParams({ request: req, requiredBody: ['id', 'password'], })
+    if (missingParameters) {
+        res.status(400).json(missingParameters)
+        return
+    }
     const id = req.body.id
     const pass = req.body.password
 
-    if(id) {
         db.getUser(id).then(user => {
-            if(pass) {
-                if(pass === user.password) {
-                    const authToken = createToken(id)
-                    res.status(200).json({token: authToken})
-                } else {
-                    res.status(400).json('Incorrect password')
-                }
+            console.log('user:', user)
+            console.log('pass:', pass)
+            if(pass == user.password) {
+                const authToken = createToken(id)
+                res.status(200).json({token: authToken})
             } else {
-                res.status(400).json('No password provided')
+                res.status(400).json('Incorrect password')
             }
         }).catch(err => {
             res.status(400).json(err) // User not found
         })
-    } else {
-        res.status(400).json('No ID provided')
-    }
 })
 
 
@@ -33,7 +33,6 @@ function createToken(userId) {
         iss: 'localhost:8080'
     }
     var token = jwt.sign(claims, 'secret')
-    console.log('Created token:', token)
     return token
 }
 
@@ -53,6 +52,6 @@ function checkToken(token) {
     })
 }
 
-exports.createToken = createToken
-exports.checkToken = checkToken
 module.exports = routes
+module.exports.checkToken = checkToken
+module.exports.createToken = createToken
