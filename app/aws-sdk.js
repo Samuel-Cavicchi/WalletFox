@@ -11,4 +11,17 @@ const s3 = new AWS.s3 ({
     region: "s3.eu-central-1.amazonaws.com" //endpoint. Maybe it should be something else?
 })
 
-s3.putOb
+s3.putObject({ // upload file from backend to server
+    Bucket: "wallet-fox-images",
+    Key: "filename",
+    Body: "file content"
+}, function(error, data) {
+
+    if (error) {
+        // :(
+    } else {
+        // :)
+    }
+
+})
+
