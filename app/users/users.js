@@ -6,10 +6,9 @@ const routes = require("express").Router();
 
 
 routes.patch("/:id", function (req, res) {
-    const testing = aws.assumeRole().then(
-        testing => 
+    aws.assumeRole().then(testing => {
         console.log("Testing: ", testing)
-    ).catch(console.log("fuck"))
+    }).catch(err => console.log("fuck", err))
 
 
     const body = req.body
