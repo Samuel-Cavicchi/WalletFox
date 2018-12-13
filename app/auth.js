@@ -82,9 +82,9 @@ function getIdTokenFromGoogle(code) {
 }
 
 routes.get("/google-redirect", function(req, res) {
-    const clientId;
-    const redirectURI;
-    var redirectUrl = `
+    clientId;
+    redirectURI;
+    redirectUrl = `
     https://accounts.google.com/o/oauth2/v2/auth?
     client_id=`+clientId+`&
     redirect_uri=`+redirectURI+`&
@@ -94,19 +94,19 @@ routes.get("/google-redirect", function(req, res) {
 })
 
 routes.get("", function(req, res) { // GET /auth
-    const missingParameters = reqhandler.checkRequestParams({ request: req, requiredBody: ['id', 'password'], })
+    missingParameters = reqhandler.checkRequestParams({ request: req, requiredBody: ['id', 'password'], })
     if (missingParameters) {
         res.status(400).json(missingParameters)
         return
     }
-    const id = req.body.id
-    const pass = req.body.password
+    id = req.body.id
+    pass = req.body.password
 
         db.getUser(id).then(user => {
             console.log('user:', user)
             console.log('pass:', pass)
             if(pass == user.password) {
-                const authToken = createToken(id)
+                authToken = createToken(id)
                 res.status(200).json({token: authToken})
             } else {
                 res.status(400).json('Incorrect password')
