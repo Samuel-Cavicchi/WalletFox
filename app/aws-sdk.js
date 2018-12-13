@@ -11,19 +11,19 @@ const sts = new AWS.STS ({
     region: "eu-central-1" // Maybe this should be something else?
 })
 
-userid = "123"
+function getUploadCredentials(userid) { 
 
-const policy = `{ "Version": "2012-10-17",
-    "Statement": [{
-        "Action": [
-            "s3:PutObject"
-        ],
-    "Effect": "Allow",
-    "Resource": "arn:aws:s3:::wallet-fox-images/` + userid + `"
-    }]
-}`
+    // Creates policy which allows user to upload an image with the same name as their user ID
+    const policy = `{ "Version": "2012-10-17",
+        "Statement": [{
+            "Action": [
+                "s3:PutObject"
+            ],
+        "Effect": "Allow",
+        "Resource": "arn:aws:s3:::wallet-fox-images/` + userid + `"
+        }]
+    }`
 
-function getUploadCredentials() {
     return new Promise (function(resolve, reject) {
         sts.assumeRole({
             RoleArn: "arn:aws:iam::373772666655:role/justtesting",

@@ -5,11 +5,14 @@ const aws = require('../aws-sdk.js')
 const routes = require("express").Router();
 
 
-routes.patch("/:id", function (req, res) {
-    aws.getUploadCredentials().then(testing => {
-        console.log("Testing: ", testing)
-    }).catch(err => console.log("fuck", err))
+routes.get("/requestImageUpload/:id", function(req, res) {
+    aws.getUploadCredentials(req.params.id).then(tempCreds => {
+        res.status(201).json(tempCreds)
+    }).catch(err => res.status(500).json("Server error"))
+})
 
+
+routes.patch("/:id", function (req, res) {
 
     const body = req.body
     const id = req.params.id
@@ -28,9 +31,17 @@ routes.patch("/:id", function (req, res) {
                         user[key] = body[key]
                     }
                 }
-                db.updateUser(id, user).then(() => {
-                    res.status(201).json("User updated")
-                }).catch(() => res.status(500).json("Server error")) // There was an issue updating the user
+
+                if (body[requestImageUpload]) {
+                    aws.getUploadCredentials(id).then(tempCreds => {
+                        res.status(201).json("User updated. Temporary aws credentials: ", tempCreds)
+                    }).catch(err => res.status(500).json("Server error"))
+                } else {
+                    db.updateUser(id, user).then(() => {
+                        res.status(201).json("User updated")
+                    }).catch(() => res.status(500).json("Server error")) // There was an issue updating the user
+                }
+
             }).catch(error => res.status(500).json("Server error")) // There was an issue finding the user
         } else {
             res.status(401).json("Unauthorised")
