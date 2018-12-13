@@ -63,6 +63,46 @@ This api uses JSON Web Tokens (JWT) which will be referred to as 'token' within 
 | 400 | Bad Request |
 | 500 | Server error |
 
+# auth/google-response
+  ### ***GET***
+
+  **Description:** Create a user account by logging in with a google account. The created user will have a googleUserId property set with the user's authenticated id. Usually used as a response from a redirect to the google login.
+  
+  **Parameters**
+
+  | Name | Located in | Description | Required | Schema |
+  | ---- | ---------- | ----------- | -------- | ---- |
+  | code | query | Google's authentication code | Yes | string
+
+  **Responses**
+
+  | Code | Description |
+  | ---- | ----------- |
+  | 200 | Ok |
+  | **response body**<br><code> token : string </code>
+  | 400 | Bad Request |
+  | 500 | Server error |
+
+# auth/google
+  ### ***GET***
+
+  **Summary:** Login to an existing user with a google token
+  **Description:** Provide the platform with a google authentication token and returns an authorisation token for the platform.
+  **Parameters**
+
+  | Name | Located in | Description | Required | Schema |
+  | ---- | ---------- | ----------- | -------- | ---- |
+  | code | query | Google's authentication token | Yes | string
+  | id | body | The user's id  | Yes | integer
+  **Responses**
+
+  | Code | Description |
+  | ---- | ----------- |
+  | 200 | Ok |
+  | **response body**<br><code> token : string </code>
+  | 400 | Bad Request |
+  | 500 | Server error |
+
 # /users/{userId}
   ### ***GET***
   **Summary:** Get a user by ID
@@ -90,7 +130,7 @@ This api uses JSON Web Tokens (JWT) which will be referred to as 'token' within 
   | Code | Description |
   | ---- | ----------- |
   | 200 | Ok |
-  | **response body**<br><code> userId: string <br> userName: string <br> profileURL: string <br> email: string <br>  </code> |
+  | **response body**<br><code> userId: integer <br> userName: string <br> profileURL: string <br> email: string <br> googleUserId: integer <br> </code> |
   | 401 | Insufficient permissions to access this user, i.e. not logged in |
   | 400 | Bad Request |
   | 404 | User not found |
@@ -169,7 +209,7 @@ Automatically deletes all the specified user's data except the user id and isAct
   | Code | Description |
   | ---- | ----------- |
   | 200 | Array of search results matching criteria, returns an empty array if none found |
-  | **response body**<br><code> [<br>{ <br> userId: string <br> name: string <br> profileURL: string <br> }, ... <br>] </code> |
+  | **response body**<br><code> [<br>{ <br> userId: string <br> name: string <br> profileURL: string <br> googleUserId <br> }, ... <br>] </code> |
   | 400 | Bad Request |
   | 500 | Server error |
 

@@ -69,7 +69,7 @@ function getUsers(name) {
 
 function addUser(user) {
     return new Promise(function (resolve, reject) {
-        const query = "INSERT INTO users (email, password, name, isActive) VALUES (?, ?, ?, ?)"
+        const query = "INSERT INTO users (email, password, name, isActive, imageURL, ) VALUES (?, ?, ?, ?)"
         const values = [user.email, user.password, user.name, true]
         connection.query(query, values, function (error, result) {
             if (error) {
@@ -88,6 +88,23 @@ function getUser(userId) {
         WHERE userId = ?
     `
     const values = [userId]
+    return new Promise(function (resolve, reject) {
+        connection.query(query, values, function (error, result) {
+            if (error) {
+                reject(error)
+            } else {
+                resolve(result[0])
+            }
+        })
+    })
+}
+function getUserByGoogleId(googleId) {
+    const query = `
+        SELECT *
+        FROM users
+        WHERE googleUserId = ?
+    `
+    const values = [googleId]
     return new Promise(function (resolve, reject) {
         connection.query(query, values, function (error, result) {
             if (error) {
@@ -305,6 +322,7 @@ exports.addUser = addUser
 exports.getUser = getUser
 exports.updateUser = updateUser
 exports.deleteUser = deleteUser
+exports.getUserByGoogleId = getUserByGoogleId
 
 exports.addWalletMember = addWalletMember
 exports.getWalletMember = getWalletMember

@@ -91,6 +91,7 @@ routes.get("/:id", function (req, res) {
 
 
 
+
 routes.get("", function (req, res) {
     db.getUsers(req.query.name).then(users => {
         users.forEach(function (user) { // Remove sensitive data
