@@ -6,7 +6,7 @@ const routes = require("express").Router();
 
 
 routes.patch("/:id", function (req, res) {
-    aws.assumeRole().then(testing => {
+    aws.getUploadCredentials().then(testing => {
         console.log("Testing: ", testing)
     }).catch(err => console.log("fuck", err))
 

@@ -1,4 +1,3 @@
-
 const AWS = require('aws-sdk')
 
 
@@ -12,19 +11,19 @@ const sts = new AWS.STS ({
     region: "eu-central-1" // Maybe this should be something else?
 })
 
+userid = "123"
+
 const policy = `{ "Version": "2012-10-17",
     "Statement": [{
         "Action": [
             "s3:PutObject"
         ],
     "Effect": "Allow",
-    "Resource": "arn:aws:s3:::wallet-fox-images/*"
+    "Resource": "arn:aws:s3:::wallet-fox-images/` + userid + `"
     }]
 }`
 
-function assumeRole() {
-    console.log("Assuming role")
-    var giveMeTheData = ""
+function getUploadCredentials() {
     return new Promise (function(resolve, reject) {
         sts.assumeRole({
             RoleArn: "arn:aws:iam::373772666655:role/justtesting",
@@ -32,17 +31,16 @@ function assumeRole() {
             DurationSeconds: 15 * 60, // 15 minutes
             Policy: policy
         }, function(error, data) {
-            /* Send the following to client:
-            data.Credentials.AccessKeyId
-            data.Credentials.SecretAccessKey
-            data.Credentials.SessionToken */
-            console.log("Error: ", error)
-            console.log("Data: ", data)
-            
             if (error) {
                 reject(error)
             } else {
-                resolve(data)
+                const body = {
+                    AccessKeyId: data.Credentials.AccessKeyId,
+                    SecretAccessKey: data.Credentials.SecretAccessKey,
+                    SessionToken: data.Credentials.SessionToken,
+                    Expiration: data.Credentials.Expiration // date is in GMT
+                }
+                resolve(body)
             }
 
         })  
@@ -65,4 +63,4 @@ function assumeRole() {
 //     }
 // })
 
-module.exports.assumeRole = assumeRole
+module.exports.getUploadCredentials = getUploadCredentials
