@@ -1,9 +1,17 @@
 db = require('../database.js');
 auth = require('../auth.js');
 reqhandler = require('../request-handler.js');
+const aws = require('../aws-sdk.js')
 const routes = require("express").Router();
 
+
 routes.patch("/:id", function (req, res) {
+    const testing = aws.assumeRole().then(
+        testing => 
+        console.log("Testing: ", testing)
+    ).catch(console.log("fuck"))
+
+
     const body = req.body
     const id = req.params.id
     const missingParameters = reqhandler.checkRequestParams({ request: req, requiredBody: ['token'], })
@@ -18,11 +26,7 @@ routes.patch("/:id", function (req, res) {
             db.getUser(id).then(user => {
                 for (key in user) {
                     if (body[key] != undefined) { // In the user object all values that matches a key of the body are replaced
-                        if (key == "image")  {
-                            
-                        } else {
-                            user[key] = body[key]
-                        }
+                        user[key] = body[key]
                     }
                 }
                 db.updateUser(id, user).then(() => {
