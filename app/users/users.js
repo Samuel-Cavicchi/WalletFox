@@ -11,13 +11,18 @@ routes.patch("/:id", function (req, res) {
         res.status(400).json(missingParameters)
         return
     }
-
+    
     auth.checkToken(req.body.token).then(authorisedUser => {
         if (authorisedUser.sub == id) { // If the authorised user is the same user being accessed
+
             db.getUser(id).then(user => {
                 for (key in user) {
                     if (body[key] != undefined) { // In the user object all values that matches a key of the body are replaced
-                        user[key] = body[key]
+                        if (key == "image")  {
+                            
+                        } else {
+                            user[key] = body[key]
+                        }
                     }
                 }
                 db.updateUser(id, user).then(() => {
