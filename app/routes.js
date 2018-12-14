@@ -1,7 +1,3 @@
-/* 
-Routes.js redirects all app routes to the correct route
-*/
-
 const routes = require("express").Router()
 
 routes.get('/', (req, res) => {

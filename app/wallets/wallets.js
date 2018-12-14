@@ -107,7 +107,6 @@ routes.delete("/:id", function (req, res) {
 
     const authToken = req.body.token
     auth.checkToken(authToken).then(authorisedUser => {
-        // TODO: Check if they are a wallet member admin
         db.getWallet(id, authorisedUser.sub).then(wallet => {
             if(wallet) {
                 db.deleteWallet(id).then(() => {
