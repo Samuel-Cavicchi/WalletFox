@@ -1,7 +1,7 @@
-db = require('../database.js');
-auth = require('../auth.js');
-reqhandler = require('../request-handler.js');
-const routes = require("express").Router();
+db = require('../database.js')
+auth = require('../auth.js')
+reqhandler = require('../request-handler.js')
+const routes = require("express").Router()
 
 routes.post("", function (req, res) {
     const missingParameters = reqhandler.checkRequestParams({ request: req, requiredBody: ['token', 'currency', 'name'], })
@@ -10,7 +10,7 @@ routes.post("", function (req, res) {
         return
     }
 
-    const authToken = req.body.token;
+    const authToken = req.body.token
     auth.checkToken(authToken).then(authorisedUser => {
         const walletToAdd = req.body
         db.addWallet(walletToAdd).then(result => { // Add a wallet
@@ -42,7 +42,7 @@ routes.get("/:id", function (req, res) {
         return
     }
 
-    const authToken = req.body.token;
+    const authToken = req.body.token
     auth.checkToken(authToken).then(authorisedUser => {
         db.getWallet(id, authorisedUser.sub).then(wallet => {
             if(wallet) {
@@ -66,7 +66,7 @@ routes.get("", function (req, res) {
         return
     }
 
-    const authToken = req.body.token;
+    const authToken = req.body.token
     auth.checkToken(authToken).then(authorisedUser => {
         db.getWallets(authorisedUser.sub).then(wallets => {
             res.status(200).json(wallets)
@@ -85,7 +85,7 @@ routes.patch("/:id", function (req, res) {
         return
     }
 
-    const authToken = req.body.token;
+    const authToken = req.body.token
     auth.checkToken(authToken).then(authorisedUser => {
         db.getWallet(id, authorisedUser.sub).then(wallet => {
             if(wallet) {
@@ -110,7 +110,7 @@ routes.delete("/:id", function (req, res) {
         return
     }
 
-    const authToken = req.body.token;
+    const authToken = req.body.token
     auth.checkToken(authToken).then(authorisedUser => {
         // TODO: Check if they are a wallet member admin
         db.getWallet(id, authorisedUser.sub).then(wallet => {
@@ -126,4 +126,4 @@ routes.delete("/:id", function (req, res) {
 })
 
 
-module.exports = routes;
+module.exports = routes

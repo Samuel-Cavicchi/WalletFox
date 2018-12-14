@@ -41,7 +41,7 @@ This api uses JSON Web Tokens (JWT) which will be referred to as 'token' within 
 
 
 # /auth
-  ### ***GET***
+### ***GET***
 **Summary:** Authenticate an existing user
 
 **Description:** Takes a user's id and password and if correct, returns a Json Web Token which can be used for authentication on specific api methods.
@@ -63,27 +63,6 @@ This api uses JSON Web Tokens (JWT) which will be referred to as 'token' within 
 | 400 | Bad Request |
 | 500 | Server error |
 
-# auth/google-response
-  ### ***GET***
-
-  **Description:** Create a user account by logging in with a google account. The created user will have a googleUserId property set with the user's authenticated id. Usually used as a response from a redirect to the google login.
-  
-  **Parameters**
-
-  | Name | Located in | Description | Required | Schema |
-  | ---- | ---------- | ----------- | -------- | ---- |
-  | code | query | Google's authentication code | Yes | string
-
-  **Responses**
-
-  | Code | Description |
-  | ---- | ----------- |
-  | 200 | Ok |
-  | **response body**<br><code> token : string </code>
-  | 400 | Bad Request |
-  | 500 | Server error |
-
-# auth/google
   ### ***GET***
 
   **Summary:** Login to an existing user with a google token
@@ -137,7 +116,7 @@ This api uses JSON Web Tokens (JWT) which will be referred to as 'token' within 
   | 404 | User not found |
   | 500 | Server error |
 
-  ### ***PATCH*** // revise
+  ### ***PATCH***
   **Summary:** Update a user's information
 
   **Description:** Update a specific user's information by supplying the user id in the request path, and by supplying the updated values in the request body.

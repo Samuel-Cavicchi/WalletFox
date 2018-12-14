@@ -1,8 +1,8 @@
-db = require('../database.js');
-auth = require('../auth.js');
-reqhandler = require('../request-handler.js');
+db = require('../database.js')
+auth = require('../auth.js')
+reqhandler = require('../request-handler.js')
 const aws = require('../aws-sdk.js')
-const routes = require("express").Router();
+const routes = require("express").Router()
 
 // Update a specific user
 routes.patch("/:id", function (req, res) {
@@ -29,14 +29,14 @@ routes.patch("/:id", function (req, res) {
                     if (body.requestImageUpload == "true") {
                         aws.getUploadCredentials(id).then(tempCreds => {
                             res.status(200).json({User: "updated", "Temporary aws credentials": tempCreds})
-                        }).catch(err => res.status(500).json("Server error"))
+                        }).catch(() => res.status(500).json("Server error"))
                     } else {
                         res.status(200).json("User updated")
                     }
                 }).catch(err => res.status(500).json(err)) // There was an issue updating the user
 
 
-            }).catch(error => res.status(500).json("Server error")) // There was an issue finding the user
+            }).catch(() => res.status(500).json("Server error")) // There was an issue finding the user
         } else {
             res.status(401).json("Unauthorised")
         }
@@ -80,7 +80,7 @@ routes.get("/:id", function (req, res) {
         return
     }
 
-    const authToken = req.body.token;
+    const authToken = req.body.token
     const id = req.params.id
     auth.checkToken(authToken).then(authorisedUser => {
         db.getUser(id).then(user => {
@@ -125,7 +125,7 @@ routes.post("", function (req, res) {
     }
 
     db.addUser(userToAdd).then(result => {
-        const userId = result.insertId;
+        const userId = result.insertId
         const token = auth.createToken(userId)
         res.setHeader('Location', '/users/' + userId)
         res.status(201).json(token)
@@ -133,7 +133,7 @@ routes.post("", function (req, res) {
     }).catch(error => {
         res.status(500).json(error)
         return
-    });
+    })
 })
 
-module.exports = routes;
+module.exports = routes

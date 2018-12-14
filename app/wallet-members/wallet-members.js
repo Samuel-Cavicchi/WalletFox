@@ -1,7 +1,7 @@
-db = require('../database.js');
-auth = require('../auth.js');
-reqhandler = require('../request-handler.js');
-const routes = require("express").Router();
+db = require('../database.js')
+auth = require('../auth.js')
+reqhandler = require('../request-handler.js')
+const routes = require("express").Router()
 
 routes.get("/:id", function (req, res) {
     const id = req.params.id
@@ -40,4 +40,4 @@ routes.post("", function (req, res) {
         })
     }).catch(() => res.status(401).json("Bad token"))
 })
-module.exports = routes;
+module.exports = routes

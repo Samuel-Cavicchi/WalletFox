@@ -35,7 +35,7 @@ function checkRequestParams(paramData) {
 
 function checkKeys(requiredKeys, requestKeys) {
     var missingParams = []
-    var isMissingParams = false;
+    var isMissingParams = false
 
     requiredKeys.forEach(function(requiredKey) {
         if(!requestKeys.includes(requiredKey)) // If the request parameters does not include the required parameter

@@ -1,6 +1,5 @@
 const AWS = require('aws-sdk')
 
-
 const credentials = new AWS.Credentials(
     "AKIAJJQGBH2XB2H6WRFQ",
     "4bJQHCZlvuFTrHpLUEgmv9HR7zQJZE0UOMST4nCQ"
@@ -8,7 +7,7 @@ const credentials = new AWS.Credentials(
 
 const sts = new AWS.STS ({
     credentials: credentials,
-    region: "eu-central-1" // Maybe this should be something else?
+    region: "eu-central-1" 
 })
 
 function getUploadCredentials(userid) { 
@@ -28,8 +27,7 @@ function getUploadCredentials(userid) {
         sts.assumeRole({
             RoleArn: "arn:aws:iam::373772666655:role/justtesting",
             RoleSessionName: "rainmaker-upload",
-            // TODO: change durationSeconds to 15 * 60
-            DurationSeconds: 60 * 60, // 15 minutes
+            DurationSeconds: 60 * 60,
             Policy: policy
         }, function(error, data) {
             if (error) {
@@ -39,7 +37,7 @@ function getUploadCredentials(userid) {
                     AccessKeyId: data.Credentials.AccessKeyId,
                     SecretAccessKey: data.Credentials.SecretAccessKey,
                     SessionToken: data.Credentials.SessionToken,
-                    Expiration: data.Credentials.Expiration // date is in GMT
+                    Expiration: data.Credentials.Expiration
                 }
                 resolve(body)
             }
@@ -47,21 +45,5 @@ function getUploadCredentials(userid) {
         })  
     })
 } 
-
-
-// const fileToUploadName = "placeholder"
-// const fileToUpLoadBody = "också placeholder"
-
-// s3.putObject({
-//     Bucket: "arn:aws:s3:::wallet-fox-images",
-//     Key: fileToUpload,        
-//     Body: fileToUpLoadBody 
-// }, function(error, data) {
-//     if(error){
-//         print(":(")
-//     } else {
-//         print(":)")
-//     }
-// })
 
 module.exports.getUploadCredentials = getUploadCredentials

@@ -1,26 +1,11 @@
 const mysql = require("mysql")
-// const connection = mysql.createConnection({
-//     host: "test.cnywqzoih3zx.eu-central-1.rds.amazonaws.com",
-//     database: "test",
-//     user: "test",
-//     password: "justtesting"
-// });
+const connection = mysql.createConnection({
+    host: "test.cnywqzoih3zx.eu-central-1.rds.amazonaws.com",
+    database: "test",
+    user: "test",
+    password: "justtesting"
+})
 
-config = {
-    user: 'root',
-    password: 'justtesting',
-    database: 'finaltest',
-    socketPath: `/cloudsql/wallet-fox-ics:us-central1:googlecloud-walletfox-database`
-}
-
-// cloud_sql_proxy.exe -instances="wallet-fox-ics:us-central1:googlecloud-walletfox-database"=tcp:3306
-// gcloud sql databases create test2 --instance=googlecloud-walletfox-database
-console.log('config:', config)
-var connection = mysql.createConnection(config);
-
-//googlecloud-walletfox-database
-//instance connection name: 
-// wallet-fox-ics:us-central1:googlecloud-walletfox-database
 connection.query(`
     CREATE TABLE IF NOT EXISTS users (
         userId INT AUTO_INCREMENT PRIMARY KEY,
@@ -30,7 +15,7 @@ connection.query(`
         isActive BOOLEAN,
         imageURL VARCHAR(100)
     )`
-);
+)
 
 connection.query(`
     CREATE TABLE IF NOT EXISTS wallets (
@@ -38,7 +23,7 @@ connection.query(`
         name VARCHAR(50),
         currency VARCHAR(20)
     )`
-);
+)
 connection.query(`
     CREATE TABLE IF NOT EXISTS wallet_members (
         walletMemberId INT AUTO_INCREMENT PRIMARY KEY,
@@ -48,7 +33,7 @@ connection.query(`
         FOREIGN KEY (userId) REFERENCES users(userId),
         FOREIGN KEY (walletId) REFERENCES wallets(walletId) ON DELETE CASCADE
     )`
-);
+)
 
 
 function getUsers(name) {
