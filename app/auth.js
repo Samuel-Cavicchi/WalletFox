@@ -103,8 +103,6 @@ routes.get("", function(req, res) { // GET /auth
     pass = req.body.password
 
         db.getUser(id).then(user => {
-            console.log('user:', user)
-            console.log('pass:', pass)
             if(pass == user.password) {
                 authToken = createToken(id)
                 res.status(200).json({token: authToken})

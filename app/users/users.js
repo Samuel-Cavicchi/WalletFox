@@ -1,10 +1,12 @@
 db = require('../database.js');
 auth = require('../auth.js');
 reqhandler = require('../request-handler.js');
+const aws = require('../aws-sdk.js')
 const routes = require("express").Router();
 
 // Update a specific user
 routes.patch("/:id", function (req, res) {
+
     const body = req.body
     const id = req.params.id
     const missingParameters = reqhandler.checkRequestParams({ request: req, requiredBody: ['token'], })
@@ -15,15 +17,25 @@ routes.patch("/:id", function (req, res) {
 
     auth.checkToken(req.body.token).then(authorisedUser => {
         if (authorisedUser.sub == id) { // If the authorised user is the same user being accessed
+
             db.getUser(id).then(user => {
                 for (key in user) {
                     if (body[key] != undefined) { // In the user object all values that matches a key of the body are replaced
                         user[key] = body[key]
                     }
                 }
+
                 db.updateUser(id, user).then(() => {
-                    res.status(201).json("User updated")
-                }).catch(() => res.status(500).json("Server error")) // There was an issue updating the user
+                    if (body.requestImageUpload == "true") {
+                        aws.getUploadCredentials(id).then(tempCreds => {
+                            res.status(200).json({User: "updated", "Temporary aws credentials": tempCreds})
+                        }).catch(err => res.status(500).json("Server error"))
+                    } else {
+                        res.status(200).json("User updated")
+                    }
+                }).catch(err => res.status(500).json(err)) // There was an issue updating the user
+
+
             }).catch(error => res.status(500).json("Server error")) // There was an issue finding the user
         } else {
             res.status(401).json("Unauthorised")
