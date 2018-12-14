@@ -1,10 +1,10 @@
 const mysql = require("mysql")
-const connection = mysql.createConnection({
-    host: "test.cnywqzoih3zx.eu-central-1.rds.amazonaws.com",
-    database: "test",
-    user: "test",
-    password: "justtesting"
-});
+// const connection = mysql.createConnection({
+//     host: "test.cnywqzoih3zx.eu-central-1.rds.amazonaws.com",
+//     database: "test",
+//     user: "test",
+//     password: "justtesting"
+// });
 
 config = {
     user: process.env.SQL_USER,
