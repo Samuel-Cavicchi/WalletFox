@@ -372,7 +372,7 @@ Automatically deletes all the specified user's data except the user id and isAct
   ### ***POST***
 **Summary:** Adds a wallet member
 
-**Description:** Adds an existing user to a specific wallet. Wallet Members can create new wallet members, only wallet member admins can create new wallet member admins.
+**Description:** Adds an existing user to a specific wallet. Wallet Members can create new wallet members.
 
 
 **Parameters**

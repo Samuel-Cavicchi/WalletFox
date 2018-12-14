@@ -11,7 +11,7 @@ routes.get("/:id", function (req, res) {
         } else {
             res.status(404).json("Wallet Member not found")
         }
-    }).catch(err => {
+    }).catch(() => {
         res.status(500).json("Server error")
     })
 })
@@ -24,16 +24,20 @@ routes.post("", function (req, res) {
         return
     }
     auth.checkToken(req.body.token).then(authorisedUser => {
-        // TODO: Check if their user id is a member of the wallet
-        db.addWalletMember(req.body.userId, req.body.walletId).then(result => {
-            res.setHeader('Location', '/wallet-members/' + result.insertId)
-            res.status(201).json("Created wallet member")
-            return
-        }).catch(error => {
-            res.status(500).json(error)
-            return
-        });
+        db.getWallet(req.body.walletId, authorisedUser.sub).then(wallet => {
+            if(wallet) {
+                db.addWalletMember(req.body.userId, req.body.walletId).then(result => {
+                    res.setHeader('Location', '/wallet-members/' + result.insertId)
+                    res.status(201).json("Created wallet member")
+                    return
+                }).catch(error => {
+                    res.status(500).json(error)
+                    return
+                })
+            } else {
+                res.status(404).json("Could not find wallet")
+            }
+        })
     }).catch(() => res.status(401).json("Bad token"))
-
 })
 module.exports = routes;

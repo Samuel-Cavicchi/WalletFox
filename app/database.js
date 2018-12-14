@@ -167,7 +167,7 @@ function addWalletMember(userId, walletId, isAdmin) {
     })
 }
 
-function getWalletMember() {
+function getWalletMember(walletMemberId) {
     const query = `
         SELECT *
         FROM wallet_members
