@@ -28,7 +28,8 @@ function getUploadCredentials(userid) {
         sts.assumeRole({
             RoleArn: "arn:aws:iam::373772666655:role/justtesting",
             RoleSessionName: "rainmaker-upload",
-            DurationSeconds: 15 * 60, // 15 minutes
+            // TODO: change durationSeconds to 15 * 60
+            DurationSeconds: 60 * 60, // 15 minutes
             Policy: policy
         }, function(error, data) {
             if (error) {

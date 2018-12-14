@@ -5,7 +5,7 @@ const aws = require('../aws-sdk.js')
 const routes = require("express").Router();
 
 
-routes.get("/requestImageUpload/:id", function(req, res) {
+routes.get("/requestImageUpload/:id", function (req, res) {
     aws.getUploadCredentials(req.params.id).then(tempCreds => {
         res.status(201).json(tempCreds)
     }).catch(err => res.status(500).json("Server error"))
@@ -21,7 +21,7 @@ routes.patch("/:id", function (req, res) {
         res.status(400).json(missingParameters)
         return
     }
-    
+
     auth.checkToken(req.body.token).then(authorisedUser => {
         if (authorisedUser.sub == id) { // If the authorised user is the same user being accessed
 
@@ -32,15 +32,16 @@ routes.patch("/:id", function (req, res) {
                     }
                 }
 
-                if (body[requestImageUpload]) {
-                    aws.getUploadCredentials(id).then(tempCreds => {
-                        res.status(201).json("User updated. Temporary aws credentials: ", tempCreds)
-                    }).catch(err => res.status(500).json("Server error"))
-                } else {
-                    db.updateUser(id, user).then(() => {
-                        res.status(201).json("User updated")
-                    }).catch(() => res.status(500).json("Server error")) // There was an issue updating the user
-                }
+                db.updateUser(id, user).then(() => {
+                    if (body.requestImageUpload == "true") {
+                        aws.getUploadCredentials(id).then(tempCreds => {
+                            res.status(200).json({User: "updated", "Temporary aws credentials": tempCreds})
+                        }).catch(err => res.status(500).json("Server error"))
+                    } else {
+                        res.status(200).json("User updated")
+                    }
+                }).catch(err => res.status(500).json(err)) // There was an issue updating the user
+
 
             }).catch(error => res.status(500).json("Server error")) // There was an issue finding the user
         } else {
