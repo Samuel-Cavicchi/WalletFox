@@ -7,11 +7,14 @@ const mysql = require("mysql")
 // });
 
 config = {
-    user: 'test',
+    user: 'test2',
     password: 'justtesting',
-    database: 'test',
+    database: 'mysql',
     socketPath: `/cloudsql/wallet-fox-ics:us-central1:googlecloud-walletfox-database`
 }
+
+// cloud_sql_proxy.exe -instances="wallet-fox-ics:us-central1:googlecloud-walletfox-database"=tcp:3306
+// gcloud sql databases create test2 --instance=googlecloud-walletfox-database
 console.log('config:', config)
 var connection = mysql.createConnection(config);
 
