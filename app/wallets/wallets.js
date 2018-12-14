@@ -14,7 +14,6 @@ routes.post("", function (req, res) {
     auth.checkToken(authToken).then(authorisedUser => {
         const walletToAdd = req.body
         db.addWallet(walletToAdd).then(result => { // Add a wallet
-            console.log('added wallet')
             db.addWalletMember(authorisedUser.sub, result.insertId, true).then(walletMember => { // Add the user as a wallet member
                 res.setHeader('Location', '/wallets/' + result.insertId)
                 res.status(201).json({ // Return the created wallet member
@@ -22,12 +21,10 @@ routes.post("", function (req, res) {
                     walletId: result.insertId, 
                     walletMemberId: walletMember.insertId
                 })
-            }).catch(error => {
-                console.log(error)
+            }).catch(() => {
                 res.status(500).json("Error adding wallet-member")
             })
-        }).catch(error => {
-            console.log(error)
+        }).catch(() => {
             res.status(500).json("Server error")
         })
     }).catch(()=> res.status(401).json("Bad token"))
@@ -70,8 +67,7 @@ routes.get("", function (req, res) {
     auth.checkToken(authToken).then(authorisedUser => {
         db.getWallets(authorisedUser.sub).then(wallets => {
             res.status(200).json(wallets)
-        }).catch(error => {
-            console.log(error)
+        }).catch(() => {
             res.status(500).json("Server error")
         })
     }).catch(() => res.status(401).json("Bad token"))
@@ -91,8 +87,7 @@ routes.patch("/:id", function (req, res) {
             if(wallet) {
                 db.updateWallet(id, req.body).then(() => {
                     res.status(200).json("Updated wallet")
-                }).catch(error => {
-                    console.log(error)
+                }).catch(() => {
                     res.status(500).json("Server error")
                 })
             } else {

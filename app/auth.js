@@ -15,10 +15,8 @@ function checkToken(token) {
     return new Promise(function(resolve, reject) {
         jwt.verify(token, 'secret', (err, decoded) => {
             if(err) {
-                console.log('error with token: ' + token + ' error: ' + err)
                 reject(err)
             } else {
-                console.log('checking token:', decoded)
                 resolve(decoded)
             }
         })

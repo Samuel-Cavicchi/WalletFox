@@ -93,8 +93,7 @@ routes.get("/:id", function (req, res) {
             } else {
                 res.status(404).json("User not found")
             }
-        }).catch(err => {
-            console.log(err)
+        }).catch(() => {
             res.status(500).json("Server error")
         })
     }).catch(() => {

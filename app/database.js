@@ -241,7 +241,6 @@ function getWallets(userId) {
 }
 function addWallet(wallet) {
     return new Promise(function (resolve, reject) {
-        console.log("Adding wallet: ", wallet)
         const query = `INSERT INTO wallets (name, currency) 
         VALUES (?, ?)`
         const values = [wallet.name, wallet.currency]
