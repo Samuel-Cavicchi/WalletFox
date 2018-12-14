@@ -1,16 +1,16 @@
 const mysql = require("mysql")
-// const connection = mysql.createConnection({
-//     host: "test.cnywqzoih3zx.eu-central-1.rds.amazonaws.com",
-//     database: "test",
-//     user: "test",
-//     password: "justtesting"
-// });
-var connection = mysql.createConnection({
-    socketPath: '/cloudsql/${process.env.wallet-fox-ics:us-central1:googlecloud-walletfox-database}',
-    user      : 'test',
-    password  : 'justtesting',
-    database  : 'test'
+const connection = mysql.createConnection({
+    host: "test.cnywqzoih3zx.eu-central-1.rds.amazonaws.com",
+    database: "test",
+    user: "test",
+    password: "justtesting"
 });
+// var connection = mysql.createConnection({
+//     socketPath: '/cloudsql/${process.env.wallet-fox-ics:us-central1:googlecloud-walletfox-database}',
+//     user      : 'test',
+//     password  : 'justtesting',
+//     database  : 'test'
+// });
 
 //googlecloud-walletfox-database
 //instance connection name: 
