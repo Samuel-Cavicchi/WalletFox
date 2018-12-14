@@ -3,6 +3,7 @@ auth = require('../auth.js');
 reqhandler = require('../request-handler.js');
 const routes = require("express").Router();
 
+// Update a specific user
 routes.patch("/:id", function (req, res) {
     const body = req.body
     const id = req.params.id
@@ -59,7 +60,7 @@ routes.delete("/:id", function (req, res) {
     }).catch(() => res.status(401).json("Bad token"))
 })
 
-// Requesting a specific user ID
+// Requesting a specific user by ID
 routes.get("/:id", function (req, res) {
     const missingParameters = reqhandler.checkRequestParams({ request: req, requiredBody: ['token'], })
     if (missingParameters) {

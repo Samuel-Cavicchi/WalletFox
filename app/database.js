@@ -16,6 +16,7 @@ connection.query(`
         imageURL VARCHAR(100)
     )`
 );
+
 connection.query(`
     CREATE TABLE IF NOT EXISTS wallets (
         walletId INT AUTO_INCREMENT PRIMARY KEY,
@@ -31,18 +32,6 @@ connection.query(`
         isAdmin BOOLEAN,
         FOREIGN KEY (userId) REFERENCES users(userId),
         FOREIGN KEY (walletId) REFERENCES wallets(walletId) ON DELETE CASCADE
-    )`
-);
-connection.query(`
-    CREATE TABLE IF NOT EXISTS payments (
-        paymentId INT AUTO_INCREMENT PRIMARY KEY,
-        description VARCHAR(50),
-        paymentDate VARCHAR(100),
-        isSettled BOOLEAN,
-        walletId INT,
-        payeeId INT,
-        FOREIGN KEY (walletId) REFERENCES wallets(walletId) ON DELETE CASCADE,
-        FOREIGN KEY (payeeId) REFERENCES users(userId)
     )`
 );
 
@@ -69,8 +58,8 @@ function getUsers(name) {
 
 function addUser(user) {
     return new Promise(function (resolve, reject) {
-        const query = "INSERT INTO users (email, password, name, isActive, imageURL, ) VALUES (?, ?, ?, ?)"
-        const values = [user.email, user.password, user.name, true]
+        const query = "INSERT INTO users (email, password, name, isActive, imageURL ) VALUES (?, ?, ?, ?, ?)"
+        const values = [user.email, user.password, user.name, true, user.imageURL]
         connection.query(query, values, function (error, result) {
             if (error) {
                 reject(error)
@@ -143,9 +132,11 @@ function updateUser(userId, updatedObject) {
 
 function deleteUser(userId) {
     const query = `
-        DELETE FROM users
-        WHERE userId = ?
-    `
+    UPDATE users
+    SET email = null, name = null, password = null, 
+    imageURL = null, googleUserId = null, isActive = false
+    WHERE userId = ?
+`
     const values = [userId]
     return new Promise(function (resolve, reject) {
         connection.query(query, values, function (error, result) {
@@ -232,7 +223,7 @@ function deleteWalletMember(walletMemberId) {
 
 
 function getWallets(userId) {
-    var query = `SELECT * 
+    var query = `SELECT wallets.walletId, wallets.currency, wallets.name
         FROM wallets, wallet_members
         WHERE wallets.walletId = wallet_members.walletId 
         AND wallet_members.userId = ?
@@ -250,7 +241,9 @@ function getWallets(userId) {
 }
 function addWallet(wallet) {
     return new Promise(function (resolve, reject) {
-        const query = "INSERT INTO wallets (name, currency) VALUES (?, ?)"
+        console.log("Adding wallet: ", wallet)
+        const query = `INSERT INTO wallets (name, currency) 
+        VALUES (?, ?)`
         const values = [wallet.name, wallet.currency]
         connection.query(query, values, function (error, result) {
             if (error) {
@@ -261,13 +254,14 @@ function addWallet(wallet) {
         })
     })
 }
-function getWallet(walletId) {
-    const query = `
-        SELECT *
-        FROM wallets
-        WHERE walletId = ?
+function getWallet(walletId, userId) {
+    const query = `SELECT *
+    FROM wallets, wallet_members
+    WHERE wallets.walletId = ?
+    AND wallets.walletId = wallet_members.walletId 
+    AND wallet_members.userId = ?
     `
-    const values = [walletId]
+    const values = [walletId, userId]
     return new Promise(function (resolve, reject) {
         connection.query(query, values, function (error, result) {
             if (error) {

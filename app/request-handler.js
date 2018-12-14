@@ -1,8 +1,4 @@
 function checkRequestParams(paramData) {
-    // paramData = {
-    //     requestBody: {kdflsjdf: 34234, asdfjad: 123},
-    //     requiredBody: [kdflsjdf]
-    // }
     var missingParams = {}
     var isMissingParams = false
     var missingKeys
@@ -55,8 +51,5 @@ function checkKeys(requiredKeys, requestKeys) {
     }
 }
 
-function checkToken(requestBody) {
-
-}
 
 module.exports.checkRequestParams = checkRequestParams

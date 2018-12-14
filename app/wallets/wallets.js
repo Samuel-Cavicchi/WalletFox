@@ -14,7 +14,8 @@ routes.post("", function (req, res) {
     auth.checkToken(authToken).then(authorisedUser => {
         const walletToAdd = req.body
         db.addWallet(walletToAdd).then(result => { // Add a wallet
-            db.addWalletMember(authorisedUser.sub, result.insertId).then(walletMember => { // Add the user as a wallet member
+            console.log('added wallet')
+            db.addWalletMember(authorisedUser.sub, result.insertId, true).then(walletMember => { // Add the user as a wallet member
                 res.setHeader('Location', '/wallets/' + result.insertId)
                 res.status(201).json({ // Return the created wallet member
                     userId: authorisedUser.sub,
@@ -43,8 +44,17 @@ routes.get("/:id", function (req, res) {
 
     const authToken = req.body.token;
     auth.checkToken(authToken).then(authorisedUser => {
-        db.getWallet(id).then(wallet => {
-            res.status(200).json(wallet)
+        db.getWallet(id, authorisedUser.sub).then(wallet => {
+            if(wallet) {
+                returnWallet = {
+                    walletId: wallet.walletId,
+                    name: wallet.name,
+                    currency: wallet.currency
+                }
+                res.status(200).json(returnWallet)
+            } else {
+                res.status(404).json("Wallet not found")
+            }
         }).catch(() => res.status(500).json("Server error"))
     }).catch(() => res.status(401).json("Bad token"))
 })
@@ -77,13 +87,18 @@ routes.patch("/:id", function (req, res) {
 
     const authToken = req.body.token;
     auth.checkToken(authToken).then(authorisedUser => {
-        // TODO: Check if they are a wallet member admin
-        db.updateWallet(id, req.body).then(() => {
-            res.status(200).json("Updated wallet")
-        }).catch(error => {
-            console.log(error)
-            res.status(500).json("Server error")
-        })
+        db.getWallet(id, authorisedUser.sub).then(wallet => {
+            if(wallet) {
+                db.updateWallet(id, req.body).then(() => {
+                    res.status(200).json("Updated wallet")
+                }).catch(error => {
+                    console.log(error)
+                    res.status(500).json("Server error")
+                })
+            } else {
+                res.status(404).json("Wallet not found")
+            }
+        }).catch(err => res.status(500).json(err))
     }).catch(() => res.status(401).json("Bad token"))
 })
 
@@ -98,18 +113,15 @@ routes.delete("/:id", function (req, res) {
     const authToken = req.body.token;
     auth.checkToken(authToken).then(authorisedUser => {
         // TODO: Check if they are a wallet member admin
-        db.getWallet(id).then(wallet => {
+        db.getWallet(id, authorisedUser.sub).then(wallet => {
             if(wallet) {
                 db.deleteWallet(id).then(() => {
                     res.status(200).json("Deleted wallet")
-                }).catch(() => res.status(500).json("Server error"))
+                }).catch(err => res.status(500).json(err))
             } else {
                 res.status(500).json("Could not find wallet to delete")
             }
-        }).catch(err => {
-            console.log(err)
-            res.status(500).json("Could not find wallet to delete")
-        })
+        }).catch(err => res.status(500).json(err))
     }).catch(() => res.status(401).json("Bad token"))
 })
 

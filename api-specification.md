@@ -110,10 +110,11 @@ This api uses JSON Web Tokens (JWT) which will be referred to as 'token' within 
   **Description:** Get a specific user from the API by specifying the user's ID and providing an access token. If the token shows that this is the user's own data it will return:
   ```
   {
-    userId: string
-    userName: string
-    profileURL: string
-    email: string
+    userId: string,
+    userName: string,
+    profileURL: string,
+    email: string,
+    googleUserId: string,
   }
   ```
   Otherwise, the API will not return the user's email as this is private information.
@@ -130,19 +131,22 @@ This api uses JSON Web Tokens (JWT) which will be referred to as 'token' within 
   | Code | Description |
   | ---- | ----------- |
   | 200 | Ok |
-  | **response body**<br><code> userId: integer <br> userName: string <br> profileURL: string <br> email: string <br> googleUserId: integer <br> </code> |
+  | **response body**<br><code> userId: integer <br> userName: string <br> profileURL: string <br> email: string <br> googleUserId: string <br> </code> |
   | 401 | Insufficient permissions to access this user, i.e. not logged in |
   | 400 | Bad Request |
   | 404 | User not found |
   | 500 | Server error |
 
-  ### ***PATCH***
+  ### ***PATCH*** // revise
   **Summary:** Update a user's information
 
   **Description:** Update a specific user's information by supplying the user id in the request path, and by supplying the updated values in the request body.
 
+  If the client would like access to upload an image to the storage as a service, they must supply the requiestImageUpload boolean as true. This will result in a response body with the Amazon Web Services Storage credentials. 
+
   **Not all model parameters are required in the request body, only the values you wish to update.**
 
+  **Permission:** The supplied token must match the user that is being updated. 
 
   **Parameters**
 
@@ -152,14 +156,16 @@ This api uses JSON Web Tokens (JWT) which will be referred to as 'token' within 
   | token | body | Authentication token | Yes | string |
   | email | body | The user's new email | No | string |
   | password | body | The user's new password | No | string |
+  | imageURL | body | The user's image URL | No | string |
+  | requestImageUpload | body | If the user wants the image upload credentials | No | boolean |
 
   **Responses**
 
   | Code | Description |
   | ---- | ----------- |
-  | 200 | Updated, new password |
-  | **response body:** |<code> token: string</code>
-  | 204 | Updated, no content |
+  | 200 | Updated |
+  | 200 | Updated, aws credentials: |
+  | **response body:** |<code> AccessKeyId: string,<br>SecretAccessKey: string, <br>SessionToken: string, <br>Expiration: string <br> </code>
   | 400 | Bad Request |
   | 401 | Insufficient permissions to update this user |
   | 404 | User not found |
@@ -173,6 +179,9 @@ This api uses JSON Web Tokens (JWT) which will be referred to as 'token' within 
 Automatically deletes all the specified user's data except the user id and isActive. isActive is set to false. This is so that the user can still be referenced historically but still have their data removed from the platform.
 
 
+**Permissions:** Only the authenticated user can delete themself. 
+
+
 **Parameters**
 
 | Name | Located in | Description | Required | Schema |
@@ -184,7 +193,7 @@ Automatically deletes all the specified user's data except the user id and isAct
 
 | Code | Description |
 | ---- | ----------- |
-| 204 | Deleted, no content |
+| 200 | User with id {userId} was deleted |
 | 400 | Bad Request |
 | 401 | Insufficient permissions to delete this user |
 | 404 | User not found |
@@ -197,6 +206,8 @@ Automatically deletes all the specified user's data except the user id and isAct
   **Description:** By passing in the appropriate options, you can search for a specific user or group of users. 
 
   For example, if you wish to find all users in a wallet you can put the walletId in the request parameters.
+
+  **Permissions:** Anyone can request to see the users, however, this does not return the user's email or password.
 
   **Parameters**
 
@@ -240,7 +251,7 @@ Automatically deletes all the specified user's data except the user id and isAct
   ### ***GET***
   **Summary:** Get all the wallets that the user is a member of
 
-  **Description:** Gets all the wallets as an array where the user has a member relation with the wallet id.
+  **Description:** Retrieves all the wallets  where that the authenticated user is a member of. 
 
 
   **Parameters**
@@ -287,7 +298,7 @@ Automatically deletes all the specified user's data except the user id and isAct
   ### ***GET***
   **Summary:** Get a wallet by ID
 
-  **Description:** Get a specific wallet from the database by specifying the wallet's ID
+  **Description:** Get a specific wallet from the database by specifying the wallet's ID. The user must be authenticated, as the wallet will only be returned if they are a wallet member. If they are not a wallet member, it will return a 404.
 
   **Parameters**
 
@@ -303,7 +314,7 @@ Automatically deletes all the specified user's data except the user id and isAct
   | 200 | OK | 
   | **response body:** | <code> walletId: integer <br> name: string <br> currency: string </code>
   | 401 | Unauthorised |
-  | 404 | Wallet does not exist |
+  | 404 | Wallet not found |
   | 500 | Server error |
 
   ### ***PATCH***
@@ -311,7 +322,7 @@ Automatically deletes all the specified user's data except the user id and isAct
 
   **Description:** Update a specific wallet's information by supplying the wallet id in the request path, and by supplying the updated values in the request body.
 
-  Only a wallet member who is admin may change a wallet's information
+  Only a wallet member may change a wallet's information.
 
 
   **Parameters**
@@ -336,7 +347,7 @@ Automatically deletes all the specified user's data except the user id and isAct
   ### ***DELETE***
 **Summary:** Delete a wallet
 
-**Description:** Delete the specified wallet including all associated wallet members, payments, payment debts and wallet debts. Only a wallet member with admin privileges can delete a wallet.
+**Description:** Delete the specified wallet including all associated wallet members. Only a wallet member may delete a wallet.
 
 
 **Parameters**

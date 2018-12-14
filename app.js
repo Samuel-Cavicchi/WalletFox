@@ -6,7 +6,7 @@ const bodyParser = require('body-parser') // TODO: Move this to a more fitting p
 const app = express();
 app.use(bodyParser.urlencoded({ extended: false })) // Set bodyparser to JSON? Need to look this up
 
-// Re-route all paths to our routing file
+// Re-route all paths to our routes.js file
 app.use("/", routes);
 
 
