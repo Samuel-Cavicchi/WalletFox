@@ -11,7 +11,10 @@ app.use(bodyParser.urlencoded({ extended: false })) // Set bodyparser to JSON? N
 // Re-route all paths to our routes.js file
 app.use("/", routes);
 
+const host = server.address().address;
+const port = server.address().port;
 
+console.log(`Example app listening at http://${host}:${port}`);
 app.listen(port, () => {
     console.log('Wallet Fox listening on port:', port); // DELETE ON SUBMISSION
 })
