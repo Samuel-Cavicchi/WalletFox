@@ -13,8 +13,6 @@ routes.get("/google-response", function(req, res) { // Response url for google o
     const code = req.query.code
     getIdTokenFromGoogle(code)
         db.getUser(id).then(user => {
-            console.log('user:', user)
-            console.log('pass:', pass)
             if(pass == user.password) {
                 const authToken = createToken(id)
                 res.status(200).json({token: authToken})
