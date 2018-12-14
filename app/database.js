@@ -5,12 +5,14 @@ const connection = mysql.createConnection({
     user: "test",
     password: "justtesting"
 });
-// var connection = mysql.createConnection({
-//     socketPath: '/cloudsql/${process.env.wallet-fox-ics:us-central1:googlecloud-walletfox-database}',
-//     user      : 'test',
-//     password  : 'justtesting',
-//     database  : 'test'
-// });
+
+config = {
+    user: process.env.SQL_USER,
+    password: process.env.SQL_PASSWORD,
+    database: process.env.SQL_DATABASE,
+    socketPath: `/cloudsql/${process.env.INSTANCE_CONNECTION_NAME}`
+}
+var connection = mysql.createConnection(config);
 
 //googlecloud-walletfox-database
 //instance connection name: 
