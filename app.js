@@ -3,7 +3,6 @@ const routes = require("./app/routes.js");
 const db = require("./app/database.js");
 const bodyParser = require('body-parser') // TODO: Move this to a more fitting place after discussion
 // var port = process.env.PORT || 8080
-var port = process.env.PORT
 const app = express();
 app.set('trust proxy', true)
 app.use(bodyParser.urlencoded({ extended: false })) // Set bodyparser to JSON? Need to look this up
