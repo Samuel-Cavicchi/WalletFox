@@ -7,9 +7,9 @@ const mysql = require("mysql")
 // });
 
 config = {
-    user: 'test2',
+    user: 'root',
     password: 'justtesting',
-    database: 'mysql',
+    database: 'finaltest',
     socketPath: `/cloudsql/wallet-fox-ics:us-central1:googlecloud-walletfox-database`
 }
 
