@@ -43,4 +43,5 @@ Push to the repository
 git push
 ```
 
-testing
+## Using the API
+Please see the [API Specification](https://github.com/Samuel-Cavicchi/WalletFox/blob/master/api-specification.md)
