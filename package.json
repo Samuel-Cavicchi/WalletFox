@@ -20,7 +20,7 @@
   "dependencies": {
     "aws-sdk": "^2.370.0",
     "body-parser": "^1.18.3",
-    "express": "^4.16.4",
+    "express": "^4.17.3",
     "jsonwebtoken": "^8.4.0",
     "mysql": "^2.16.0",
     "request": "^2.88.0"
